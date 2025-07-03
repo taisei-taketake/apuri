@@ -325,10 +325,50 @@
                 const scale = genres[genre].scale;
                 const melody = [];
                 
-                for (let i = 0; i < 8; i++) {
-                    const note = scale[Math.floor(Math.random() * scale.length)];
-                    melody.push(note);
-                }
+                // より多様なメロディーパターンを生成
+                const patterns = [
+                    // 上昇パターン
+                    () => {
+                        for (let i = 0; i < 8; i++) {
+                            const noteIndex = Math.min(i % 4, scale.length - 1);
+                            melody.push(scale[noteIndex]);
+                        }
+                    },
+                    // 下降パターン
+                    () => {
+                        for (let i = 0; i < 8; i++) {
+                            const noteIndex = Math.max(3 - (i % 4), 0);
+                            melody.push(scale[noteIndex]);
+                        }
+                    },
+                    // ランダムパターン
+                    () => {
+                        for (let i = 0; i < 8; i++) {
+                            const note = scale[Math.floor(Math.random() * scale.length)];
+                            melody.push(note);
+                        }
+                    },
+                    // 波形パターン
+                    () => {
+                        const wavePattern = [0, 2, 4, 2, 1, 3, 5, 3];
+                        for (let i = 0; i < 8; i++) {
+                            const noteIndex = wavePattern[i] % scale.length;
+                            melody.push(scale[noteIndex]);
+                        }
+                    },
+                    // 繰り返しパターン
+                    () => {
+                        const basePattern = [0, 2, 1, 3];
+                        for (let i = 0; i < 8; i++) {
+                            const noteIndex = basePattern[i % 4] % scale.length;
+                            melody.push(scale[noteIndex]);
+                        }
+                    }
+                ];
+                
+                // ランダムにパターンを選択
+                const selectedPattern = patterns[Math.floor(Math.random() * patterns.length)];
+                selectedPattern();
                 
                 return melody;
             };
@@ -337,11 +377,40 @@
                 const chords = genres[genre].chords;
                 const bassNotes = [];
                 
-                chords.forEach(chord => {
-                    // コードのルート音を1オクターブ下げる
-                    const rootNote = chord[0].replace(/\d/, (match) => (parseInt(match) - 1).toString());
-                    bassNotes.push(rootNote);
-                });
+                // より多様なベースラインパターンを生成
+                const bassPatterns = [
+                    // 基本的なルート音パターン
+                    () => {
+                        chords.forEach(chord => {
+                            const rootNote = chord[0].replace(/\d/, (match) => (parseInt(match) - 1).toString());
+                            bassNotes.push(rootNote);
+                        });
+                    },
+                    // オクターブ跳躍パターン
+                    () => {
+                        chords.forEach((chord, index) => {
+                            const octave = index % 2 === 0 ? 2 : 1;
+                            const rootNote = chord[0].replace(/\d/, octave.toString());
+                            bassNotes.push(rootNote);
+                        });
+                    },
+                    // ウォーキングベースパターン
+                    () => {
+                        chords.forEach((chord, index) => {
+                            const rootNote = chord[0].replace(/\d/, (match) => (parseInt(match) - 1).toString());
+                            bassNotes.push(rootNote);
+                            if (index < chords.length - 1) {
+                                // 次のコードに向かう経過音を追加
+                                const nextRoot = chords[index + 1][0].replace(/\d/, (match) => (parseInt(match) - 1).toString());
+                                bassNotes.push(nextRoot);
+                            }
+                        });
+                    }
+                ];
+                
+                // ランダムにパターンを選択
+                const selectedPattern = bassPatterns[Math.floor(Math.random() * bassPatterns.length)];
+                selectedPattern();
                 
                 return bassNotes;
             };
@@ -374,12 +443,20 @@
                         }
                     }, bass, '2n');
                     
-                    // ドラムパターン
+                    // ドラムパターン - ジャンルに応じて変化
+                    const drumPatterns = {
+                        ambient: ['C2', null, null, 'C2', null, null, 'C2', null],
+                        electronic: ['C2', null, 'C2', null, 'C2', null, 'C2', 'C2'],
+                        jazz: ['C2', null, 'C2', null, null, 'C2', null, 'C2'],
+                        lofi: ['C2', null, null, 'C2', null, 'C2', null, null]
+                    };
+                    
+                    const selectedDrumPattern = drumPatterns[currentGenre] || drumPatterns.ambient;
                     const drumPattern = new Tone.Sequence((time, note) => {
-                        if (drums) {
+                        if (drums && note) {
                             drums.triggerAttackRelease('C2', '16n', time);
                         }
-                    }, ['C2', null, 'C2', null], '8n');
+                    }, selectedDrumPattern, '8n');
                     
                     melodySequence.start(0);
                     bassSequence.start(0);
@@ -434,8 +511,23 @@
             };
             
             const generateNewPattern = () => {
+                // ランダムに新しいジャンルを選択
+                const genreKeys = Object.keys(genres);
+                const randomGenre = genreKeys[Math.floor(Math.random() * genreKeys.length)];
+                
+                // 現在のジャンルと異なる場合は更新
+                if (randomGenre !== currentGenre) {
+                    setCurrentGenre(randomGenre);
+                    setCurrentTempo(genres[randomGenre].tempo);
+                }
+                
                 if (isPlaying) {
                     stopMusic();
+                    setTimeout(() => {
+                        startMusic();
+                    }, 100);
+                } else {
+                    // 停止中でも新しいパターンで自動再生
                     setTimeout(() => {
                         startMusic();
                     }, 100);
@@ -469,7 +561,7 @@
                                 className="generate-button"
                                 onClick={generateNewPattern}
                             >
-                                🎲 新しいパターン
+                                🎲 ランダムジャンル生成
                             </button>
                         </div>
                         
@@ -514,10 +606,11 @@
                         <div className="section">
                             <h2 className="section-title">使用方法</h2>
                             <div className="instruction-text">
-                                1. お好みのジャンルを選択してください<br/>
-                                2. 「再生」ボタンで音楽を開始<br/>
-                                3. 「新しいパターン」で別のメロディーを生成<br/>
-                                4. 各ジャンルごとに異なる雰囲気の音楽が楽しめます
+                                1. 「再生」ボタンで音楽を開始<br/>
+                                2. 「新しいパターン」で<strong>ランダムなジャンル</strong>の音楽を自動生成<br/>
+                                3. 手動でジャンルを選択することも可能<br/>
+                                4. 各パターンで異なるメロディー、ベース、ドラムが楽しめます<br/>
+                                5. 新しいパターンは自動的に再生が開始されます
                             </div>
                         </div>
                     </div>
