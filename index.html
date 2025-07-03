@@ -239,6 +239,78 @@
                     tempo: 85,
                     scale: ['C4', 'D4', 'Eb4', 'F4', 'G4', 'Ab4', 'Bb4', 'C5'],
                     chords: [['C4', 'Eb4', 'G4'], ['F4', 'Ab4', 'C5'], ['Bb4', 'D5', 'F5'], ['G4', 'Bb4', 'D5']]
+                },
+                rock: {
+                    name: 'ロック',
+                    tempo: 140,
+                    scale: ['E4', 'G4', 'A4', 'B4', 'D5', 'E5', 'G5'],
+                    chords: [['E4', 'G4', 'B4'], ['A4', 'C5', 'E5'], ['D5', 'F#5', 'A5'], ['G4', 'B4', 'D5']]
+                },
+                classical: {
+                    name: 'クラシック',
+                    tempo: 100,
+                    scale: ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5'],
+                    chords: [['C4', 'E4', 'G4'], ['F4', 'A4', 'C5'], ['G4', 'B4', 'D5'], ['A4', 'C5', 'E5'], ['F4', 'A4', 'C5'], ['G4', 'B4', 'D5']]
+                },
+                reggae: {
+                    name: 'レゲエ',
+                    tempo: 90,
+                    scale: ['C4', 'D4', 'Eb4', 'F4', 'G4', 'Ab4', 'Bb4', 'C5'],
+                    chords: [['C4', 'Eb4', 'G4'], ['F4', 'Ab4', 'C5'], ['Bb4', 'D5', 'F5'], ['Eb4', 'G4', 'Bb4']]
+                },
+                latin: {
+                    name: 'ラテン',
+                    tempo: 110,
+                    scale: ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'],
+                    chords: [['C4', 'E4', 'G4'], ['Am4', 'C5', 'E5'], ['F4', 'A4', 'C5'], ['G4', 'B4', 'D5']]
+                },
+                blues: {
+                    name: 'ブルース',
+                    tempo: 95,
+                    scale: ['C4', 'Eb4', 'F4', 'F#4', 'G4', 'Bb4', 'C5'],
+                    chords: [['C4', 'E4', 'G4'], ['F4', 'A4', 'C5'], ['G4', 'B4', 'D5'], ['C4', 'E4', 'G4']]
+                },
+                funk: {
+                    name: 'ファンク',
+                    tempo: 115,
+                    scale: ['C4', 'D4', 'Eb4', 'F4', 'G4', 'A4', 'Bb4', 'C5'],
+                    chords: [['C4', 'Eb4', 'G4'], ['F4', 'Ab4', 'C5'], ['Bb4', 'D5', 'F5'], ['G4', 'Bb4', 'D5']]
+                },
+                trap: {
+                    name: 'トラップ',
+                    tempo: 140,
+                    scale: ['C4', 'D4', 'Eb4', 'G4', 'Ab4', 'Bb4', 'C5'],
+                    chords: [['C4', 'Eb4', 'G4'], ['Ab4', 'C5', 'Eb5'], ['Bb4', 'D5', 'F5'], ['G4', 'Bb4', 'D5']]
+                },
+                dubstep: {
+                    name: 'ダブステップ',
+                    tempo: 140,
+                    scale: ['C4', 'D4', 'Eb4', 'F#4', 'G4', 'Ab4', 'Bb4', 'C5'],
+                    chords: [['C4', 'Eb4', 'G4'], ['F#4', 'A4', 'C5'], ['Bb4', 'D5', 'F5'], ['Ab4', 'C5', 'Eb5']]
+                },
+                synthwave: {
+                    name: 'シンセウェーブ',
+                    tempo: 125,
+                    scale: ['C4', 'D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C5'],
+                    chords: [['C4', 'E4', 'G4'], ['Am4', 'C5', 'E5'], ['F4', 'A4', 'C5'], ['G4', 'B4', 'D5']]
+                },
+                house: {
+                    name: 'ハウス',
+                    tempo: 128,
+                    scale: ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'],
+                    chords: [['C4', 'E4', 'G4'], ['F4', 'A4', 'C5'], ['G4', 'B4', 'D5'], ['Am4', 'C5', 'E5']]
+                },
+                minimalist: {
+                    name: 'ミニマル',
+                    tempo: 60,
+                    scale: ['C4', 'D4', 'E4', 'G4', 'A4', 'C5'],
+                    chords: [['C4', 'E4', 'G4'], ['F4', 'A4', 'C5'], ['G4', 'B4', 'D5'], ['C4', 'E4', 'G4']]
+                },
+                bossanova: {
+                    name: 'ボサノヴァ',
+                    tempo: 105,
+                    scale: ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'],
+                    chords: [['C4', 'E4', 'G4', 'B4'], ['Am4', 'C5', 'E5', 'G5'], ['F4', 'A4', 'C5', 'E5'], ['G4', 'B4', 'D5', 'F5']]
                 }
             };
             
@@ -448,7 +520,19 @@
                         ambient: ['C2', null, null, 'C2', null, null, 'C2', null],
                         electronic: ['C2', null, 'C2', null, 'C2', null, 'C2', 'C2'],
                         jazz: ['C2', null, 'C2', null, null, 'C2', null, 'C2'],
-                        lofi: ['C2', null, null, 'C2', null, 'C2', null, null]
+                        lofi: ['C2', null, null, 'C2', null, 'C2', null, null],
+                        rock: ['C2', 'C2', 'C2', 'C2', 'C2', 'C2', 'C2', 'C2'],
+                        classical: ['C2', null, null, null, 'C2', null, null, null],
+                        reggae: [null, 'C2', null, 'C2', null, 'C2', null, 'C2'],
+                        latin: ['C2', null, 'C2', 'C2', null, 'C2', null, 'C2'],
+                        blues: ['C2', null, 'C2', null, 'C2', null, null, 'C2'],
+                        funk: ['C2', null, 'C2', 'C2', null, 'C2', 'C2', null],
+                        trap: ['C2', null, null, 'C2', null, null, 'C2', 'C2'],
+                        dubstep: ['C2', null, 'C2', null, 'C2', 'C2', null, 'C2'],
+                        synthwave: ['C2', null, 'C2', null, 'C2', null, 'C2', null],
+                        house: ['C2', null, 'C2', null, 'C2', null, 'C2', null],
+                        minimalist: ['C2', null, null, null, null, null, null, null],
+                        bossanova: ['C2', null, null, 'C2', null, null, 'C2', null]
                     };
                     
                     const selectedDrumPattern = drumPatterns[currentGenre] || drumPatterns.ambient;
@@ -607,10 +691,22 @@
                             <h2 className="section-title">使用方法</h2>
                             <div className="instruction-text">
                                 1. 「再生」ボタンで音楽を開始<br/>
-                                2. 「新しいパターン」で<strong>ランダムなジャンル</strong>の音楽を自動生成<br/>
-                                3. 手動でジャンルを選択することも可能<br/>
-                                4. 各パターンで異なるメロディー、ベース、ドラムが楽しめます<br/>
-                                5. 新しいパターンは自動的に再生が開始されます
+                                2. 「ランダムジャンル生成」で<strong>16種類</strong>のジャンルからランダム選択<br/>
+                                3. 手動で好きなジャンルを選択することも可能<br/>
+                                4. 各ジャンルで異なるメロディー、ベース、ドラムパターンを楽しめます<br/>
+                                5. クラシックからトラップまで幅広い音楽ジャンルをカバー
+                            </div>
+                        </div>
+                        
+                        {/* ジャンル説明 */}
+                        <div className="section">
+                            <h2 className="section-title">ジャンル一覧</h2>
+                            <div className="instruction-text">
+                                <strong>チル系:</strong> アンビエント、Lo-Fi、ミニマル、ボサノヴァ<br/>
+                                <strong>ダンス系:</strong> エレクトロニック、ハウス、ダブステップ、トラップ<br/>
+                                <strong>クラシック系:</strong> クラシック、ジャズ、ブルース<br/>
+                                <strong>エナジー系:</strong> ロック、ファンク、レゲエ、ラテン<br/>
+                                <strong>モダン系:</strong> シンセウェーブ
                             </div>
                         </div>
                     </div>
