@@ -14,25 +14,25 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: #1a1a1a;
             color: #fff;
             min-height: 100vh;
         }
-        
+
         .container {
             min-height: 100vh;
             background-color: #1a1a1a;
         }
-        
+
         .header {
             padding: 60px 20px 20px 20px;
             background-color: #2c2c2c;
             border-bottom: 2px solid #444;
         }
-        
+
         .title {
             font-size: 28px;
             font-weight: bold;
@@ -40,23 +40,23 @@
             text-align: center;
             margin-bottom: 5px;
         }
-        
+
         .subtitle {
             font-size: 14px;
             color: #ccc;
             text-align: center;
         }
-        
+
         .content {
             padding: 0 20px;
             max-width: 600px;
             margin: 0 auto;
         }
-        
+
         .control-section {
             margin: 30px 0 20px 0;
         }
-        
+
         .play-button {
             background-color: #4CAF50;
             color: #fff;
@@ -70,19 +70,19 @@
             margin-bottom: 15px;
             transition: background-color 0.3s;
         }
-        
+
         .play-button:hover {
             background-color: #45a049;
         }
-        
+
         .play-button.active {
             background-color: #FF5722;
         }
-        
+
         .play-button.active:hover {
             background-color: #e64a19;
         }
-        
+
         .generate-button {
             background-color: #2196F3;
             color: #fff;
@@ -93,32 +93,33 @@
             font-weight: 600;
             cursor: pointer;
             width: 100%;
+            margin-bottom: 15px;
             transition: background-color 0.3s;
         }
-        
+
         .generate-button:hover {
             background-color: #1976D2;
         }
-        
+
         .section {
             margin-bottom: 25px;
         }
-        
+
         .section-title {
             font-size: 18px;
             font-weight: bold;
             color: #fff;
             margin-bottom: 15px;
         }
-        
-        .genre-container {
+
+        .genre-container, .mood-container, .environment-container {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             justify-content: space-between;
         }
-        
-        .genre-button {
+
+        .genre-button, .mood-button, .environment-button {
             background-color: #3c3c3c;
             color: #ccc;
             border: none;
@@ -127,51 +128,59 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            width: 48%;
+            width: 48%; /* 2列表示 */
             transition: all 0.3s;
         }
         
-        .genre-button:hover {
+        .genre-button { width: 31%; } /* ジャンルは3列 */
+
+
+        .genre-button:hover, .mood-button:hover, .environment-button:hover {
             background-color: #4c4c4c;
         }
-        
-        .genre-button.active {
+
+        .genre-button.active, .mood-button.active {
             background-color: #FF9800;
             color: #fff;
         }
-        
+        .environment-button.active {
+            background-color: #00BCD4; /* シアン系 */
+            color: #fff;
+        }
+
         .info-container {
             background-color: #2c2c2c;
             padding: 15px;
             border-radius: 10px;
+            margin-bottom: 15px;
         }
-        
+
         .info-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
         }
-        
+
         .info-label {
             color: #ccc;
             font-size: 14px;
         }
-        
+
         .info-value {
             color: #fff;
             font-size: 14px;
             font-weight: 600;
         }
-        
+
         .info-value.playing {
             color: #4CAF50;
         }
-        
+
         .info-value.stopped {
             color: #FF5722;
         }
-        
+
         .instruction-text {
             color: #ccc;
             font-size: 14px;
@@ -180,7 +189,7 @@
             padding: 15px;
             border-radius: 10px;
         }
-        
+
         .error-message {
             background-color: #f44336;
             color: white;
@@ -189,9 +198,47 @@
             margin-bottom: 20px;
             text-align: center;
         }
-        
+
+        .slider-container {
+            margin-top: 10px;
+        }
+
+        .slider {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 8px;
+            border-radius: 5px;
+            background: #555;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+        .slider:hover {
+            opacity: 1;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00BCD4;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00BCD4;
+            cursor: pointer;
+        }
+
         @media (max-width: 600px) {
-            .genre-button {
+            .genre-button, .mood-button, .environment-button {
                 width: 100%;
             }
         }
@@ -199,385 +246,495 @@
 </head>
 <body>
     <div id="root"></div>
-    
+
     <script type="text/babel">
-        const { useState, useEffect } = React;
-        
+        const { useState, useEffect, useRef } = React;
+
         const BGMGeneratorApp = () => {
             const [isPlaying, setIsPlaying] = useState(false);
-            const [currentGenre, setCurrentGenre] = useState('ambient');
+            const [currentGenre, setCurrentGenre] = useState('ambient'); // 初期ジャンル
+            const [currentMood, setCurrentMood] = useState('relaxed'); // 初期ムード
             const [currentTempo, setCurrentTempo] = useState(80);
+            const [activeEnvironmentSounds, setActiveEnvironmentSounds] = useState({}); // 環境音のオン/オフと音量
             const [synth, setSynth] = useState(null);
-            const [bassLine, setBassLine] = useState(null);
-            const [drums, setDrums] = useState(null);
+            const [bassSynth, setBassSynth] = useState(null);
+            const [drumSynth, setDrumSynth] = useState(null);
+            const [environmentPlayers, setEnvironmentPlayers] = useState({});
             const [sequences, setSequences] = useState([]);
             const [error, setError] = useState('');
             const [isInitialized, setIsInitialized] = useState(false);
-            
-            // 音色定義
+
+            // Tone.jsのエフェクト
+            const reverb = useRef(null);
+            const delay = useRef(null);
+
+            // 音色定義 (ジャンルごとのスケール、コード進行、テンポ、ドラムパターン)
             const genres = {
                 ambient: {
                     name: 'アンビエント',
-                    tempo: 80,
-                    scale: ['C4', 'D4', 'E4', 'G4', 'A4', 'C5', 'D5'],
-                    chords: [['C4', 'E4', 'G4'], ['F4', 'A4', 'C5'], ['G4', 'B4', 'D5'], ['A4', 'C5', 'E5']]
+                    defaultMood: 'relaxed',
+                    tempo: 70,
+                    scale: ['C3', 'D3', 'Eb3', 'G3', 'A3', 'C4', 'D4'],
+                    chordProgressions: [
+                        [['C3', 'Eb3', 'G3'], ['G3', 'Bb3', 'D4'], ['Am3', 'C4', 'E4'], ['F3', 'A3', 'C4']],
+                        [['C3', 'Eb3', 'G3'], ['F3', 'A3', 'C4'], ['Bb3', 'D4', 'F4'], ['G3', 'Bb3', 'D4']]
+                    ],
+                    drumPattern: {
+                        kick: ['0:0:0', null, null, null, '0:2:0', null, null, null],
+                        snare: [null, null, '0:1:2', null, null, null, '0:3:2', null],
+                        hihat: ['16n', '16n', '16n', '16n', '16n', '16n', '16n', '16n']
+                    }
                 },
                 electronic: {
                     name: 'エレクトロニック',
+                    defaultMood: 'energetic',
                     tempo: 128,
-                    scale: ['C4', 'D4', 'Eb4', 'G4', 'Ab4', 'C5', 'D5'],
-                    chords: [['C4', 'Eb4', 'G4'], ['F4', 'Ab4', 'C5'], ['Bb4', 'D5', 'F5'], ['G4', 'Bb4', 'D5']]
+                    scale: ['C3', 'D3', 'Eb3', 'G3', 'Ab3', 'C4', 'D4'],
+                    chordProgressions: [
+                        [['C3', 'Eb3', 'G3'], ['F3', 'Ab3', 'C4'], ['Bb3', 'D4', 'F4'], ['Eb3', 'G3', 'Bb3']],
+                        [['C3', 'Eb3', 'G3'], ['Ab3', 'C4', 'Eb4'], ['F3', 'Ab3', 'C4'], ['G3', 'Bb3', 'D4']]
+                    ],
+                    drumPattern: {
+                        kick: ['0:0:0', null, null, null, '0:2:0', null, null, null],
+                        snare: [null, null, '0:1:0', null, null, null, '0:3:0', null],
+                        hihat: ['16n', '16n', '16n', '16n', '16n', '16n', '16n', '16n']
+                    }
                 },
                 jazz: {
                     name: 'ジャズ',
+                    defaultMood: 'relaxed',
                     tempo: 120,
-                    scale: ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'Bb4', 'C5'],
-                    chords: [['C4', 'E4', 'G4', 'B4'], ['F4', 'A4', 'C5', 'E5'], ['G4', 'B4', 'D5', 'F5'], ['A4', 'C5', 'E5', 'G5']]
+                    scale: ['C3', 'D3', 'Eb3', 'F3', 'G3', 'A3', 'Bb3', 'C4'],
+                    chordProgressions: [
+                        [['C3', 'E3', 'G3', 'Bb3'], ['F3', 'A3', 'C4', 'Eb4'], ['Bb3', 'D4', 'F4', 'Ab4'], ['Eb3', 'G3', 'Bb3', 'D4']], // II-V-I
+                        [['Am3', 'C4', 'E4', 'G4'], ['D3', 'F#3', 'A3', 'C4'], ['G3', 'B3', 'D4', 'F4'], ['C3', 'E3', 'G3', 'B3']]
+                    ],
+                    drumPattern: {
+                        kick: ['0:0:0', null, null, null, '0:2:0', null, null, null],
+                        snare: [null, null, '0:1:0', null, null, null, '0:3:0', null],
+                        hihat: ['8n', null, '8n', null, '8n', null, '8n', null]
+                    }
                 },
                 lofi: {
                     name: 'Lo-Fi',
+                    defaultMood: 'relaxed',
                     tempo: 85,
-                    scale: ['C4', 'D4', 'Eb4', 'F4', 'G4', 'Ab4', 'Bb4', 'C5'],
-                    chords: [['C4', 'Eb4', 'G4'], ['F4', 'Ab4', 'C5'], ['Bb4', 'D5', 'F5'], ['G4', 'Bb4', 'D5']]
+                    scale: ['C3', 'D3', 'Eb3', 'F3', 'G3', 'Ab3', 'Bb3', 'C4'],
+                    chordProgressions: [
+                        [['C3', 'Eb3', 'G3'], ['F3', 'Ab3', 'C4'], ['Bb3', 'D4', 'F4'], ['G3', 'Bb3', 'D4']],
+                        [['C3', 'E3', 'G3'], ['Am3', 'C4', 'E4'], ['F3', 'A3', 'C4'], ['G3', 'B3', 'D4']]
+                    ],
+                    drumPattern: {
+                        kick: ['0:0:0', null, null, null, '0:2:0', null, null, null],
+                        snare: [null, null, '0:1:0', null, null, null, '0:3:0', null],
+                        hihat: ['16n', null, '16n', null, '16n', null, '16n', null]
+                    }
                 },
                 rock: {
                     name: 'ロック',
+                    defaultMood: 'energetic',
                     tempo: 140,
-                    scale: ['E4', 'G4', 'A4', 'B4', 'D5', 'E5', 'G5'],
-                    chords: [['E4', 'G4', 'B4'], ['A4', 'C5', 'E5'], ['D5', 'F#5', 'A5'], ['G4', 'B4', 'D5']]
+                    scale: ['E3', 'G3', 'A3', 'B3', 'D4', 'E4', 'G4'],
+                    chordProgressions: [
+                        [['E3', 'G3', 'B3'], ['A3', 'C4', 'E4'], ['D3', 'F#3', 'A3'], ['G3', 'B3', 'D4']],
+                        [['E3', 'G3', 'B3'], ['C3', 'E3', 'G3'], ['G3', 'B3', 'D4'], ['D3', 'F#3', 'A3']]
+                    ],
+                    drumPattern: {
+                        kick: ['0:0:0', null, null, '0:1:2', '0:2:0', null, null, '0:3:2'],
+                        snare: [null, null, '0:1:0', null, null, null, '0:3:0', null],
+                        hihat: ['8n', '8n', '8n', '8n', '8n', '8n', '8n', '8n']
+                    }
                 },
                 classical: {
                     name: 'クラシック',
+                    defaultMood: 'calm',
                     tempo: 100,
-                    scale: ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5'],
-                    chords: [['C4', 'E4', 'G4'], ['F4', 'A4', 'C5'], ['G4', 'B4', 'D5'], ['A4', 'C5', 'E5'], ['F4', 'A4', 'C5'], ['G4', 'B4', 'D5']]
+                    scale: ['C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B3', 'C4'],
+                    chordProgressions: [
+                        [['C3', 'E3', 'G3'], ['G3', 'B3', 'D4'], ['C3', 'E3', 'G3'], ['F3', 'A3', 'C4'], ['G3', 'B3', 'D4'], ['C3', 'E3', 'G3']],
+                        [['C3', 'E3', 'G3'], ['Am3', 'C4', 'E4'], ['Dm3', 'F3', 'A3'], ['G3', 'B3', 'D4']]
+                    ],
+                    drumPattern: {
+                        kick: ['0:0:0', null, null, null, null, null, null, null],
+                        snare: [null, null, null, null, null, null, null, null],
+                        hihat: [null, null, null, null, null, null, null, null]
+                    }
                 },
                 reggae: {
                     name: 'レゲエ',
+                    defaultMood: 'relaxed',
                     tempo: 90,
-                    scale: ['C4', 'D4', 'Eb4', 'F4', 'G4', 'Ab4', 'Bb4', 'C5'],
-                    chords: [['C4', 'Eb4', 'G4'], ['F4', 'Ab4', 'C5'], ['Bb4', 'D5', 'F5'], ['Eb4', 'G4', 'Bb4']]
+                    scale: ['C3', 'D3', 'Eb3', 'F3', 'G3', 'Ab3', 'Bb3', 'C4'],
+                    chordProgressions: [
+                        [['C3', 'Eb3', 'G3'], ['F3', 'Ab3', 'C4'], ['G3', 'Bb3', 'D4'], ['C3', 'Eb3', 'G3']]
+                    ],
+                    drumPattern: {
+                        kick: ['0:0:0', null, null, null, '0:2:0', null, null, null],
+                        snare: [null, null, '0:1:0', null, null, null, '0:3:0', null],
+                        hihat: [null, '8n', null, '8n', null, '8n', null, '8n'] // オフビートハイハット
+                    }
                 },
                 latin: {
                     name: 'ラテン',
+                    defaultMood: 'energetic',
                     tempo: 110,
-                    scale: ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'],
-                    chords: [['C4', 'E4', 'G4'], ['Am4', 'C5', 'E5'], ['F4', 'A4', 'C5'], ['G4', 'B4', 'D5']]
+                    scale: ['C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B3', 'C4'],
+                    chordProgressions: [
+                        [['C3', 'E3', 'G3'], ['Am3', 'C4', 'E4'], ['F3', 'A3', 'C4'], ['G3', 'B3', 'D4']]
+                    ],
+                    drumPattern: {
+                        kick: ['0:0:0', null, '0:1:0', null, '0:2:0', null, '0:3:0', null],
+                        snare: [null, null, null, '0:1:2', null, null, null, '0:3:2'],
+                        hihat: ['16n', '16n', '16n', '16n', '16n', '16n', '16n', '16n']
+                    }
                 },
                 blues: {
                     name: 'ブルース',
+                    defaultMood: 'calm',
                     tempo: 95,
-                    scale: ['C4', 'Eb4', 'F4', 'F#4', 'G4', 'Bb4', 'C5'],
-                    chords: [['C4', 'E4', 'G4'], ['F4', 'A4', 'C5'], ['G4', 'B4', 'D5'], ['C4', 'E4', 'G4']]
+                    scale: ['C3', 'Eb3', 'F3', 'F#3', 'G3', 'Bb3', 'C4'],
+                    chordProgressions: [
+                        [['C3', 'E3', 'G3', 'Bb3'], ['F3', 'A3', 'C4', 'Eb4'], ['C3', 'E3', 'G3', 'Bb3'], ['G3', 'B3', 'D4', 'F4']] // 12小節ブルース
+                    ],
+                    drumPattern: {
+                        kick: ['0:0:0', null, null, null, '0:2:0', null, null, null],
+                        snare: [null, null, '0:1:0', null, null, null, '0:3:0', null],
+                        hihat: ['8n', '8n', '8n', '8n', '8n', '8n', '8n', '8n']
+                    }
                 },
                 funk: {
                     name: 'ファンク',
+                    defaultMood: 'energetic',
                     tempo: 115,
-                    scale: ['C4', 'D4', 'Eb4', 'F4', 'G4', 'A4', 'Bb4', 'C5'],
-                    chords: [['C4', 'Eb4', 'G4'], ['F4', 'Ab4', 'C5'], ['Bb4', 'D5', 'F5'], ['G4', 'Bb4', 'D5']]
+                    scale: ['C3', 'D3', 'Eb3', 'F3', 'G3', 'A3', 'Bb3', 'C4'],
+                    chordProgressions: [
+                        [['C3', 'Eb3', 'G3'], ['F3', 'Ab3', 'C4'], ['Bb3', 'D4', 'F4'], ['Eb3', 'G3', 'Bb3']]
+                    ],
+                    drumPattern: {
+                        kick: ['0:0:0', null, null, '0:1:2', '0:2:0', null, null, '0:3:2'],
+                        snare: [null, null, '0:1:0', null, null, null, '0:3:0', null],
+                        hihat: ['16n', '16n', '16n', '16n', '16n', '16n', '16n', '16n']
+                    }
                 },
                 trap: {
                     name: 'トラップ',
+                    defaultMood: 'energetic',
                     tempo: 140,
-                    scale: ['C4', 'D4', 'Eb4', 'G4', 'Ab4', 'Bb4', 'C5'],
-                    chords: [['C4', 'Eb4', 'G4'], ['Ab4', 'C5', 'Eb5'], ['Bb4', 'D5', 'F5'], ['G4', 'Bb4', 'D5']]
+                    scale: ['C3', 'D3', 'Eb3', 'G3', 'Ab3', 'Bb3', 'C4'],
+                    chordProgressions: [
+                        [['C3', 'Eb3', 'G3'], ['Ab3', 'C4', 'Eb4'], ['Bb3', 'D4', 'F4'], ['G3', 'Bb3', 'D4']]
+                    ],
+                    drumPattern: {
+                        kick: ['0:0:0', null, null, '0:1:2', null, null, null, '0:3:2'],
+                        snare: [null, null, '0:1:0', null, null, null, '0:3:0', null],
+                        hihat: ['32n', '32n', '32n', '32n', '32n', '32n', '32n', '32n'] // 早いハイハット
+                    }
                 },
                 dubstep: {
                     name: 'ダブステップ',
+                    defaultMood: 'energetic',
                     tempo: 140,
-                    scale: ['C4', 'D4', 'Eb4', 'F#4', 'G4', 'Ab4', 'Bb4', 'C5'],
-                    chords: [['C4', 'Eb4', 'G4'], ['F#4', 'A4', 'C5'], ['Bb4', 'D5', 'F5'], ['Ab4', 'C5', 'Eb5']]
+                    scale: ['C3', 'D3', 'Eb3', 'F#3', 'G3', 'Ab3', 'Bb3', 'C4'],
+                    chordProgressions: [
+                        [['C3', 'Eb3', 'G3'], ['F#3', 'A3', 'C4'], ['Bb3', 'D4', 'F4'], ['Ab3', 'C4', 'Eb4']]
+                    ],
+                    drumPattern: {
+                        kick: ['0:0:0', null, null, null, '0:2:0', null, null, null],
+                        snare: [null, null, '0:1:0', null, null, null, '0:3:0', null],
+                        hihat: ['16n', null, '16n', null, '16n', null, '16n', null]
+                    }
                 },
                 synthwave: {
                     name: 'シンセウェーブ',
+                    defaultMood: 'calm',
                     tempo: 125,
-                    scale: ['C4', 'D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C5'],
-                    chords: [['C4', 'E4', 'G4'], ['Am4', 'C5', 'E5'], ['F4', 'A4', 'C5'], ['G4', 'B4', 'D5']]
+                    scale: ['C3', 'D3', 'E3', 'F#3', 'G3', 'A3', 'B3', 'C4'],
+                    chordProgressions: [
+                        [['C3', 'E3', 'G3'], ['Am3', 'C4', 'E4'], ['F3', 'A3', 'C4'], ['G3', 'B3', 'D4']]
+                    ],
+                    drumPattern: {
+                        kick: ['0:0:0', null, null, null, '0:2:0', null, null, null],
+                        snare: [null, null, '0:1:0', null, null, null, '0:3:0', null],
+                        hihat: ['8n', '8n', '8n', '8n', '8n', '8n', '8n', '8n']
+                    }
                 },
                 house: {
                     name: 'ハウス',
+                    defaultMood: 'energetic',
                     tempo: 128,
-                    scale: ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'],
-                    chords: [['C4', 'E4', 'G4'], ['F4', 'A4', 'C5'], ['G4', 'B4', 'D5'], ['Am4', 'C5', 'E5']]
+                    scale: ['C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B3', 'C4'],
+                    chordProgressions: [
+                        [['C3', 'E3', 'G3'], ['F3', 'A3', 'C4'], ['G3', 'B3', 'D4'], ['Am3', 'C4', 'E4']]
+                    ],
+                    drumPattern: {
+                        kick: ['0:0:0', '0:1:0', '0:2:0', '0:3:0', '0:0:0', '0:1:0', '0:2:0', '0:3:0'], // 4つ打ち
+                        snare: [null, null, '0:1:0', null, null, null, '0:3:0', null],
+                        hihat: ['16n', '16n', '16n', '16n', '16n', '16n', '16n', '16n']
+                    }
                 },
                 minimalist: {
                     name: 'ミニマル',
+                    defaultMood: 'calm',
                     tempo: 60,
-                    scale: ['C4', 'D4', 'E4', 'G4', 'A4', 'C5'],
-                    chords: [['C4', 'E4', 'G4'], ['F4', 'A4', 'C5'], ['G4', 'B4', 'D5'], ['C4', 'E4', 'G4']]
+                    scale: ['C3', 'D3', 'E3', 'G3', 'A3', 'C4'],
+                    chordProgressions: [
+                        [['C3', 'E3', 'G3'], ['F3', 'A3', 'C4'], ['C3', 'E3', 'G3'], ['G3', 'B3', 'D4']]
+                    ],
+                    drumPattern: {
+                        kick: ['0:0:0', null, null, null, null, null, null, null],
+                        snare: [null, null, null, null, null, null, null, null],
+                        hihat: [null, null, null, null, null, null, null, null]
+                    }
                 },
                 bossanova: {
                     name: 'ボサノヴァ',
+                    defaultMood: 'relaxed',
                     tempo: 105,
-                    scale: ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'],
-                    chords: [['C4', 'E4', 'G4', 'B4'], ['Am4', 'C5', 'E5', 'G5'], ['F4', 'A4', 'C5', 'E5'], ['G4', 'B4', 'D5', 'F5']]
+                    scale: ['C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B3', 'C4'],
+                    chordProgressions: [
+                        [['C3', 'E3', 'G3', 'B3'], ['Am3', 'C4', 'E4', 'G4'], ['Dm3', 'F3', 'A3', 'C4'], ['G3', 'B3', 'D4', 'F4']]
+                    ],
+                    drumPattern: {
+                        kick: ['0:0:0', null, null, '0:1:2', null, null, '0:3:0', null],
+                        snare: [null, '0:0:2', null, null, null, '0:2:2', null, null],
+                        hihat: ['8n', '8n', '8n', '8n', '8n', '8n', '8n', '8n']
+                    }
                 }
             };
-            
+
+            const moods = {
+                relaxed: { name: 'リラックス', genres: ['ambient', 'lofi', 'jazz', 'reggae', 'bossanova', 'minimalist'], tempoRange: [60, 100] },
+                energetic: { name: '活発', genres: ['electronic', 'rock', 'latin', 'funk', 'trap', 'dubstep', 'house'], tempoRange: [110, 150] },
+                focused: { name: '集中', genres: ['ambient', 'minimalist', 'classical', 'lofi'], tempoRange: [70, 110] },
+                happy: { name: '幸せ', genres: ['pop', 'jazz', 'latin', 'house'], tempoRange: [90, 130] } // 新しいムードを追加する場合はここに
+            };
+
+            const environmentSounds = {
+                rain: { name: '雨', file: 'https://tonejs.github.io/audio/sfx/rain.mp3' },
+                campfire: { name: '焚き火', file: 'https://tonejs.github.io/audio/sfx/fire.mp3' },
+                cafe: { name: 'カフェ', file: 'https://tonejs.github.io/audio/sfx/ambience.mp3' },
+                forest: { name: '森の鳥', file: 'https://tonejs.github.io/audio/sfx/birds.mp3' }
+            };
+
             // 初期化
             useEffect(() => {
                 setCurrentTempo(genres[currentGenre].tempo);
-            }, [currentGenre]);
-            
+                // 環境音の初期音量を設定
+                const initialVolumes = {};
+                Object.keys(environmentSounds).forEach(key => {
+                    initialVolumes[key] = { active: false, volume: 0 };
+                });
+                setActiveEnvironmentSounds(initialVolumes);
+            }, []);
+
             useEffect(() => {
                 return () => {
                     stopMusic();
+                    // Dispose Tone.js context when component unmounts
+                    if (Tone.context) {
+                        Tone.context.dispose();
+                    }
                 };
             }, []);
-            
+
             const initializeAudio = async () => {
                 try {
                     if (isInitialized) return;
-                    
+
                     // Tone.jsの初期化
                     if (Tone.context.state !== 'running') {
                         await Tone.start();
                     }
-                    
-                    // シンセサイザーの設定
+
+                    // エフェクトの初期化
+                    reverb.current = new Tone.Reverb({
+                        decay: 3,
+                        preDelay: 0.01,
+                        wet: 0.3 // リバーブの量を設定
+                    }).toDestination();
+
+                    delay.current = new Tone.FeedbackDelay({
+                        delayTime: "8n",
+                        feedback: 0.4,
+                        wet: 0.2 // ディレイの量を設定
+                    }).toDestination();
+
+                    // シンセサイザーの設定 (エフェクトを接続)
                     const synthInstance = new Tone.PolySynth(Tone.Synth, {
-                        oscillator: {
-                            type: 'sine'
-                        },
-                        envelope: {
-                            attack: 0.1,
-                            decay: 0.3,
-                            sustain: 0.5,
-                            release: 1
-                        }
-                    }).toDestination();
-                    
-                    // ベースラインの設定
+                        oscillator: { type: 'sine' },
+                        envelope: { attack: 0.1, decay: 0.3, sustain: 0.5, release: 1 }
+                    }).connect(reverb.current).connect(delay.current).toDestination();
+
                     const bassInstance = new Tone.Synth({
-                        oscillator: {
-                            type: 'square'
-                        },
-                        envelope: {
-                            attack: 0.1,
-                            decay: 0.3,
-                            sustain: 0.4,
-                            release: 0.8
-                        }
+                        oscillator: { type: 'square' },
+                        envelope: { attack: 0.1, decay: 0.3, sustain: 0.4, release: 0.8 }
                     }).toDestination();
-                    
-                    // ドラムの設定
+
                     const drumInstance = new Tone.MembraneSynth({
-                        pitchDecay: 0.05,
-                        octaves: 10,
-                        oscillator: {
-                            type: 'sine'
-                        },
-                        envelope: {
-                            attack: 0.001,
-                            decay: 0.4,
-                            sustain: 0.01,
-                            release: 1.4
-                        }
+                        pitchDecay: 0.05, octaves: 10, oscillator: { type: 'sine' },
+                        envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 }
                     }).toDestination();
-                    
+
                     setSynth(synthInstance);
-                    setBassLine(bassInstance);
-                    setDrums(drumInstance);
-                    
+                    setBassSynth(bassInstance);
+                    setDrumSynth(drumInstance);
+
+                    // 環境音プレーヤーの初期化
+                    const players = {};
+                    for (const key in environmentSounds) {
+                        players[key] = new Tone.Player(environmentSounds[key].file).toDestination();
+                        players[key].loop = true;
+                        players[key].volume.value = -Infinity; // 初期はミュート
+                    }
+                    setEnvironmentPlayers(players);
+
                     // 音量調整
                     synthInstance.volume.value = -10;
                     bassInstance.volume.value = -15;
                     drumInstance.volume.value = -20;
-                    
+
                     setIsInitialized(true);
                     setError('');
-                    
+
                 } catch (error) {
                     console.error('Audio initialization error:', error);
-                    setError('音声の初期化に失敗しました: ' + error.message);
+                    setError('音声の初期化に失敗しました: ' + error.message + ' (ページをリロードして再試行してください)');
                 }
             };
-            
-            const generateMelody = (genre) => {
-                const scale = genres[genre].scale;
+
+            // メロディー生成ロジック
+            const generateMelody = (genreKey) => {
+                const genre = genres[genreKey];
+                const scale = genre.scale;
                 const melody = [];
-                
+
                 // より多様なメロディーパターンを生成
                 const patterns = [
-                    // 上昇パターン
-                    () => {
+                    () => { // 上昇パターン
                         for (let i = 0; i < 8; i++) {
-                            const noteIndex = Math.min(i % 4, scale.length - 1);
+                            const noteIndex = Math.min(i % scale.length, scale.length - 1);
                             melody.push(scale[noteIndex]);
                         }
                     },
-                    // 下降パターン
-                    () => {
+                    () => { // 下降パターン
                         for (let i = 0; i < 8; i++) {
-                            const noteIndex = Math.max(3 - (i % 4), 0);
+                            const noteIndex = Math.max(scale.length - 1 - (i % scale.length), 0);
                             melody.push(scale[noteIndex]);
                         }
                     },
-                    // ランダムパターン
-                    () => {
+                    () => { // ランダムパターン
                         for (let i = 0; i < 8; i++) {
                             const note = scale[Math.floor(Math.random() * scale.length)];
                             melody.push(note);
                         }
                     },
-                    // 波形パターン
-                    () => {
-                        const wavePattern = [0, 2, 4, 2, 1, 3, 5, 3];
+                    () => { // アルペジオ風パターン
+                        const chord = genre.chordProgressions[0][Math.floor(Math.random() * genre.chordProgressions[0].length)];
                         for (let i = 0; i < 8; i++) {
-                            const noteIndex = wavePattern[i] % scale.length;
-                            melody.push(scale[noteIndex]);
-                        }
-                    },
-                    // 繰り返しパターン
-                    () => {
-                        const basePattern = [0, 2, 1, 3];
-                        for (let i = 0; i < 8; i++) {
-                            const noteIndex = basePattern[i % 4] % scale.length;
-                            melody.push(scale[noteIndex]);
+                            melody.push(chord[i % chord.length]);
                         }
                     }
                 ];
-                
-                // ランダムにパターンを選択
+
                 const selectedPattern = patterns[Math.floor(Math.random() * patterns.length)];
                 selectedPattern();
-                
                 return melody;
             };
-            
-            const generateBassLine = (genre) => {
-                const chords = genres[genre].chords;
+
+            // ベースライン生成ロジック
+            const generateBassLine = (genreKey) => {
+                const genre = genres[genreKey];
+                const chords = genre.chordProgressions[Math.floor(Math.random() * genre.chordProgressions.length)];
                 const bassNotes = [];
-                
-                // より多様なベースラインパターンを生成
-                const bassPatterns = [
-                    // 基本的なルート音パターン
-                    () => {
-                        chords.forEach(chord => {
-                            const rootNote = chord[0].replace(/\d/, (match) => (parseInt(match) - 1).toString());
-                            bassNotes.push(rootNote);
-                        });
-                    },
-                    // オクターブ跳躍パターン
-                    () => {
-                        chords.forEach((chord, index) => {
-                            const octave = index % 2 === 0 ? 2 : 1;
-                            const rootNote = chord[0].replace(/\d/, octave.toString());
-                            bassNotes.push(rootNote);
-                        });
-                    },
-                    // ウォーキングベースパターン
-                    () => {
-                        chords.forEach((chord, index) => {
-                            const rootNote = chord[0].replace(/\d/, (match) => (parseInt(match) - 1).toString());
-                            bassNotes.push(rootNote);
-                            if (index < chords.length - 1) {
-                                // 次のコードに向かう経過音を追加
-                                const nextRoot = chords[index + 1][0].replace(/\d/, (match) => (parseInt(match) - 1).toString());
-                                bassNotes.push(nextRoot);
-                            }
-                        });
-                    }
-                ];
-                
-                // ランダムにパターンを選択
-                const selectedPattern = bassPatterns[Math.floor(Math.random() * bassPatterns.length)];
-                selectedPattern();
-                
+
+                chords.forEach(chord => {
+                    const rootNote = chord[0].replace(/\d/, (match) => (parseInt(match) - 1).toString()); // 1オクターブ下げる
+                    bassNotes.push(rootNote);
+                });
                 return bassNotes;
             };
-            
+
+            // 音楽の開始
             const startMusic = async () => {
                 try {
                     await initializeAudio();
-                    
-                    if (!synth || !bassLine || !drums) {
+
+                    if (!synth || !bassSynth || !drumSynth) {
                         throw new Error('音声システムが初期化されていません');
                     }
-                    
-                    const genre = genres[currentGenre];
-                    Tone.Transport.bpm.value = genre.tempo;
-                    
+
+                    const genreData = genres[currentGenre];
+                    Tone.Transport.bpm.value = genreData.tempo;
+
                     const melody = generateMelody(currentGenre);
                     const bass = generateBassLine(currentGenre);
-                    
+
+                    // 既存のシーケンスを破棄
+                    sequences.forEach(seq => seq.dispose());
+                    setSequences([]);
+
                     // メロディーシーケンス
-                    const melodySequence = new Tone.Sequence((time, note) => {
-                        if (synth) {
+                    const newMelodySequence = new Tone.Sequence((time, note) => {
+                        if (synth && note) {
                             synth.triggerAttackRelease(note, '8n', time);
                         }
                     }, melody, '8n');
-                    
+
                     // ベースラインシーケンス
-                    const bassSequence = new Tone.Sequence((time, note) => {
-                        if (bassLine) {
-                            bassLine.triggerAttackRelease(note, '4n', time);
+                    const newBassSequence = new Tone.Sequence((time, note) => {
+                        if (bassSynth && note) {
+                            bassSynth.triggerAttackRelease(note, '4n', time);
                         }
                     }, bass, '2n');
-                    
-                    // ドラムパターン - ジャンルに応じて変化
-                    const drumPatterns = {
-                        ambient: ['C2', null, null, 'C2', null, null, 'C2', null],
-                        electronic: ['C2', null, 'C2', null, 'C2', null, 'C2', 'C2'],
-                        jazz: ['C2', null, 'C2', null, null, 'C2', null, 'C2'],
-                        lofi: ['C2', null, null, 'C2', null, 'C2', null, null],
-                        rock: ['C2', 'C2', 'C2', 'C2', 'C2', 'C2', 'C2', 'C2'],
-                        classical: ['C2', null, null, null, 'C2', null, null, null],
-                        reggae: [null, 'C2', null, 'C2', null, 'C2', null, 'C2'],
-                        latin: ['C2', null, 'C2', 'C2', null, 'C2', null, 'C2'],
-                        blues: ['C2', null, 'C2', null, 'C2', null, null, 'C2'],
-                        funk: ['C2', null, 'C2', 'C2', null, 'C2', 'C2', null],
-                        trap: ['C2', null, null, 'C2', null, null, 'C2', 'C2'],
-                        dubstep: ['C2', null, 'C2', null, 'C2', 'C2', null, 'C2'],
-                        synthwave: ['C2', null, 'C2', null, 'C2', null, 'C2', null],
-                        house: ['C2', null, 'C2', null, 'C2', null, 'C2', null],
-                        minimalist: ['C2', null, null, null, null, null, null, null],
-                        bossanova: ['C2', null, null, 'C2', null, null, 'C2', null]
-                    };
-                    
-                    const selectedDrumPattern = drumPatterns[currentGenre] || drumPatterns.ambient;
-                    const drumPattern = new Tone.Sequence((time, note) => {
-                        if (drums && note) {
-                            drums.triggerAttackRelease('C2', '16n', time);
-                        }
-                    }, selectedDrumPattern, '8n');
-                    
-                    melodySequence.start(0);
-                    bassSequence.start(0);
-                    drumPattern.start(0);
-                    
-                    setSequences([melodySequence, bassSequence, drumPattern]);
-                    
+
+                    // ドラムシーケンス
+                    const drumPattern = genreData.drumPattern;
+                    const newKickSequence = new Tone.Sequence((time, note) => {
+                        if (drumSynth && note) { drumSynth.triggerAttackRelease('C2', '8n', time, 0.8); }
+                    }, drumPattern.kick, '8n');
+                    const newSnareSequence = new Tone.Sequence((time, note) => {
+                        if (drumSynth && note) { drumSynth.triggerAttackRelease('E2', '8n', time, 0.6); }
+                    }, drumPattern.snare, '8n');
+                    const newHiHatSequence = new Tone.Sequence((time, note) => {
+                        if (drumSynth && note) { drumSynth.triggerAttackRelease('G2', '16n', time, 0.3); }
+                    }, drumPattern.hihat, '16n');
+
+                    newMelodySequence.start(0);
+                    newBassSequence.start(0);
+                    newKickSequence.start(0);
+                    newSnareSequence.start(0);
+                    newHiHatSequence.start(0);
+
+                    setSequences([newMelodySequence, newBassSequence, newKickSequence, newSnareSequence, newHiHatSequence]);
+
                     Tone.Transport.start();
                     setIsPlaying(true);
                     setError('');
-                    
+
                 } catch (error) {
                     console.error('Error starting music:', error);
                     setError('音楽の再生に失敗しました: ' + error.message);
                 }
             };
-            
+
+            // 音楽の停止
             const stopMusic = () => {
                 try {
                     Tone.Transport.stop();
                     Tone.Transport.cancel();
-                    
-                    if (sequences.length > 0) {
-                        sequences.forEach(seq => {
-                            if (seq) {
-                                seq.dispose();
-                            }
-                        });
-                        setSequences([]);
-                    }
-                    
+
+                    sequences.forEach(seq => {
+                        if (seq) { seq.dispose(); }
+                    });
+                    setSequences([]);
+
                     setIsPlaying(false);
                 } catch (error) {
                     console.error('Error stopping music:', error);
                 }
             };
-            
+
+            // 再生/停止の切り替え
             const togglePlayback = () => {
                 if (isPlaying) {
                     stopMusic();
@@ -585,53 +742,91 @@
                     startMusic();
                 }
             };
-            
-            const changeGenre = (genre) => {
+
+            // ジャンル変更
+            const changeGenre = (genreKey) => {
+                if (isPlaying) { stopMusic(); }
+                setCurrentGenre(genreKey);
+                setCurrentTempo(genres[genreKey].tempo);
+                // ジャンル変更時にムードは維持するか、ジャンルのデフォルトムードに合わせるか検討
+                // ここではジャンルのデフォルトムードに合わせる
+                setCurrentMood(genres[genreKey].defaultMood); 
+            };
+
+            // ムード変更
+            const changeMood = (moodKey) => {
+                setCurrentMood(moodKey);
+                const moodData = moods[moodKey];
+                const genreOptions = moodData.genres;
+                const randomGenre = genreOptions[Math.floor(Math.random() * genreOptions.length)];
+                
+                // ジャンルとテンポをムードに基づいて更新
+                setCurrentGenre(randomGenre);
+                setCurrentTempo(moodData.tempoRange[0] + Math.floor(Math.random() * (moodData.tempoRange[1] - moodData.tempoRange[0])));
+
+                // 再生中なら新しい設定で再開
                 if (isPlaying) {
                     stopMusic();
+                    setTimeout(() => { startMusic(); }, 100);
                 }
-                setCurrentGenre(genre);
-                setCurrentTempo(genres[genre].tempo);
             };
-            
+
+            // ランダムジャンル生成（ムードにも影響）
             const generateNewPattern = () => {
-                // ランダムに新しいジャンルを選択
-                const genreKeys = Object.keys(genres);
-                const randomGenre = genreKeys[Math.floor(Math.random() * genreKeys.length)];
-                
-                // 現在のジャンルと異なる場合は更新
-                if (randomGenre !== currentGenre) {
-                    setCurrentGenre(randomGenre);
-                    setCurrentTempo(genres[randomGenre].tempo);
-                }
-                
-                if (isPlaying) {
-                    stopMusic();
-                    setTimeout(() => {
-                        startMusic();
-                    }, 100);
-                } else {
-                    // 停止中でも新しいパターンで自動再生
-                    setTimeout(() => {
-                        startMusic();
-                    }, 100);
-                }
+                const moodKeys = Object.keys(moods);
+                const randomMoodKey = moodKeys[Math.floor(Math.random() * moodKeys.length)];
+                changeMood(randomMoodKey); // ランダムムードを選択し、それに紐づくジャンルとテンポを設定
             };
-            
+
+            // 環境音のオン/オフ切り替え
+            const toggleEnvironmentSound = async (soundKey) => {
+                await initializeAudio(); // 環境音再生のためオーディオ初期化
+                setActiveEnvironmentSounds(prev => {
+                    const newActive = { ...prev };
+                    newActive[soundKey] = { ...newActive[soundKey], active: !newActive[soundKey].active };
+
+                    if (newActive[soundKey].active) {
+                        if (environmentPlayers[soundKey] && environmentPlayers[soundKey].state !== 'started') {
+                            environmentPlayers[soundKey].start();
+                            environmentPlayers[soundKey].volume.value = newActive[soundKey].volume === 0 ? -Infinity : newActive[soundKey].volume; // 音量が0ならミュート
+                        }
+                    } else {
+                        if (environmentPlayers[soundKey]) {
+                            environmentPlayers[soundKey].stop();
+                        }
+                    }
+                    return newActive;
+                });
+            };
+
+            // 環境音の音量変更
+            const handleEnvironmentVolumeChange = (soundKey, event) => {
+                const newVolume = parseFloat(event.target.value);
+                setActiveEnvironmentSounds(prev => {
+                    const newActive = { ...prev };
+                    newActive[soundKey] = { ...newActive[soundKey], volume: newVolume };
+                    if (environmentPlayers[soundKey]) {
+                         // 音量調整 (デシベルに変換)
+                        environmentPlayers[soundKey].volume.value = newVolume === 0 ? -Infinity : Tone.gainToDb(newVolume);
+                    }
+                    return newActive;
+                });
+            };
+
             return (
                 <div className="container">
                     <div className="header">
                         <h1 className="title">🎵 BGM Generator</h1>
-                        <p className="subtitle">自動音楽生成アプリ</p>
+                        <p className="subtitle">AIによる自動音楽生成アプリ</p>
                     </div>
-                    
+
                     <div className="content">
                         {error && (
                             <div className="error-message">
                                 {error}
                             </div>
                         )}
-                        
+
                         {/* 再生コントロール */}
                         <div className="control-section">
                             <button
@@ -640,35 +835,85 @@
                             >
                                 {isPlaying ? '⏸️ 停止' : '▶️ 再生'}
                             </button>
-                            
+
                             <button
                                 className="generate-button"
                                 onClick={generateNewPattern}
                             >
-                                🎲 ランダムジャンル生成
+                                🎲 ランダム生成 (ムード＆ジャンル)
                             </button>
                         </div>
-                        
-                        {/* ジャンル選択 */}
+
+                        {/* ムード選択 */}
                         <div className="section">
-                            <h2 className="section-title">ジャンル選択</h2>
-                            <div className="genre-container">
-                                {Object.entries(genres).map(([key, genre]) => (
+                            <h2 className="section-title">ムードを選択</h2>
+                            <div className="mood-container">
+                                {Object.entries(moods).map(([key, mood]) => (
                                     <button
                                         key={key}
-                                        className={`genre-button ${currentGenre === key ? 'active' : ''}`}
-                                        onClick={() => changeGenre(key)}
+                                        className={`mood-button ${currentMood === key ? 'active' : ''}`}
+                                        onClick={() => changeMood(key)}
                                     >
-                                        {genre.name}
+                                        {mood.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* ジャンル選択 */}
+                        <div className="section">
+                            <h2 className="section-title">ジャンル選択 (ムード連動)</h2>
+                            <div className="genre-container">
+                                {moods[currentMood].genres.map(genreKey => (
+                                    <button
+                                        key={genreKey}
+                                        className={`genre-button ${currentGenre === genreKey ? 'active' : ''}`}
+                                        onClick={() => changeGenre(genreKey)}
+                                    >
+                                        {genres[genreKey].name}
                                     </button>
                                 ))}
                             </div>
                         </div>
                         
+                        {/* 環境音ミックス */}
+                        <div className="section">
+                            <h2 className="section-title">環境音ミックス</h2>
+                            <div className="environment-container">
+                                {Object.entries(environmentSounds).map(([key, sound]) => (
+                                    <div key={key} style={{ width: '48%', marginBottom: '10px' }}>
+                                        <button
+                                            className={`environment-button ${activeEnvironmentSounds[key]?.active ? 'active' : ''}`}
+                                            onClick={() => toggleEnvironmentSound(key)}
+                                        >
+                                            {activeEnvironmentSounds[key]?.active ? 'ON' : 'OFF'} {sound.name}
+                                        </button>
+                                        {activeEnvironmentSounds[key]?.active && (
+                                            <div className="slider-container">
+                                                <input
+                                                    type="range"
+                                                    min="0"
+                                                    max="1"
+                                                    step="0.01"
+                                                    value={activeEnvironmentSounds[key]?.volume || 0}
+                                                    className="slider"
+                                                    onChange={(e) => handleEnvironmentVolumeChange(key, e)}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
                         {/* 現在の設定 */}
                         <div className="section">
                             <h2 className="section-title">現在の設定</h2>
                             <div className="info-container">
+                                <div className="info-row">
+                                    <span className="info-label">ムード:</span>
+                                    <span className="info-value">{moods[currentMood].name}</span>
+                                </div>
                                 <div className="info-row">
                                     <span className="info-label">ジャンル:</span>
                                     <span className="info-value">{genres[currentGenre].name}</span>
@@ -685,35 +930,11 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        {/* 使用方法 */}
-                        <div className="section">
-                            <h2 className="section-title">使用方法</h2>
-                            <div className="instruction-text">
-                                1. 「再生」ボタンで音楽を開始<br/>
-                                2. 「ランダムジャンル生成」で<strong>16種類</strong>のジャンルからランダム選択<br/>
-                                3. 手動で好きなジャンルを選択することも可能<br/>
-                                4. 各ジャンルで異なるメロディー、ベース、ドラムパターンを楽しめます<br/>
-                                5. クラシックからトラップまで幅広い音楽ジャンルをカバー
-                            </div>
-                        </div>
-                        
-                        {/* ジャンル説明 */}
-                        <div className="section">
-                            <h2 className="section-title">ジャンル一覧</h2>
-                            <div className="instruction-text">
-                                <strong>チル系:</strong> アンビエント、Lo-Fi、ミニマル、ボサノヴァ<br/>
-                                <strong>ダンス系:</strong> エレクトロニック、ハウス、ダブステップ、トラップ<br/>
-                                <strong>クラシック系:</strong> クラシック、ジャズ、ブルース<br/>
-                                <strong>エナジー系:</strong> ロック、ファンク、レゲエ、ラテン<br/>
-                                <strong>モダン系:</strong> シンセウェーブ
-                            </div>
-                        </div>
                     </div>
                 </div>
             );
         };
-        
+
         ReactDOM.render(<BGMGeneratorApp />, document.getElementById('root'));
     </script>
 </body>
