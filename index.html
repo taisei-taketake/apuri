@@ -477,7 +477,7 @@
                     }
                 },
                 lead: {
-                    emoji: '�',
+                    emoji: '🎺',
                     name: 'Lead',
                     synthType: 'MonoSynth',
                     config: {
@@ -836,32 +836,32 @@
             };
 
             // 楽器パートを再生するシーケンスを設定
-            const playInstrumentPart = (instrumentType, part, tempo) => {
-                const instrument = instruments[instrumentType];
-                if (!instrument || !part || part.length === 0) return null;
+            // 修正点: instrumentInstance を引数として受け取る
+            const playInstrumentPart = (instrumentInstance, instrumentType, part, tempo) => {
+                // instrumentInstance を直接使用
+                if (!instrumentInstance || !part || part.length === 0) return null;
 
-                // Tone.js のルーパーやシーケンサーを使用
                 let sequence;
                 if (instrumentType === 'drums') {
                     sequence = new Tone.Sequence((time, index) => {
                         const hits = part[index % part.length];
                         hits.forEach(hit => {
-                            if (instrument[hit]) {
-                                // ドラムは音程ではなくトリガー
-                                instrument[hit].triggerAttackRelease('8n', time); // '8n'は持続時間
+                            // instrumentInstance の中の個別のドラムシンセを使用
+                            if (instrumentInstance[hit]) {
+                                instrumentInstance[hit].triggerAttackRelease('8n', time);
                             }
                         });
-                    }, Array.from({ length: part.length }, (_, i) => i), '16n'); // 16分音符でシーケンス
+                    }, Array.from({ length: part.length }, (_, i) => i), '16n');
                 } else {
                     sequence = new Tone.Sequence((time, note) => {
                         if (note) {
                             if (Array.isArray(note)) { // 和音の場合
-                                instrument.triggerAttackRelease(note, '4n', time);
+                                instrumentInstance.triggerAttackRelease(note, '4n', time);
                             } else { // 単音の場合
-                                instrument.triggerAttackRelease(note, '4n', time);
+                                instrumentInstance.triggerAttackRelease(note, '4n', time);
                             }
                         }
-                    }, part, '4n'); // 4分音符でシーケンス
+                    }, part, '4n');
                 }
                 sequence.loop = true;
                 sequence.start(0); // すぐに開始
@@ -1004,8 +1004,10 @@
                     // 各楽器のパートをシーケンスとして設定
                     for (const instrumentName in parts) {
                         const part = parts[instrumentName];
-                        if (part && newInstruments[instrumentName]) {
-                            const seq = playInstrumentPart(instrumentName, part, parameters.tempo);
+                        const instrumentInstance = newInstruments[instrumentName]; // 修正点: ここで楽器インスタンスを取得
+                        if (part && instrumentInstance) {
+                            // 修正点: 取得した楽器インスタンスを playInstrumentPart に渡す
+                            const seq = playInstrumentPart(instrumentInstance, instrumentName, part, parameters.tempo);
                             if (seq) {
                                 newSequences.push(seq);
                             }
@@ -1152,4 +1154,3 @@
     </script>
 </body>
 </html>
-�
