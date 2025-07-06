@@ -904,26 +904,39 @@ ination();
 
             const playMusic = async () => {
                 try {
-                    await initializeAudio();
-                    
+                    // 音響システムの初期化を確認
+                    if (!isInitialized) {
+                        await initializeAudio();
+                    }
+
+                    // 楽曲が生成されていない場合は生成
                     if (sequences.length === 0) {
                         await generateRandomMusic();
                         return;
                     }
 
+                    // Tone.jsの状態を確認
+                    if (Tone.context.state !== 'running') {
+                        await Tone.start();
+                    }
+
+                    // テンポを設定
                     Tone.Transport.bpm.value = currentParameters.tempo;
                     
+                    // シーケンスを開始
                     sequences.forEach(sequence => {
-                        if (sequence) {
+                        if (sequence && sequence.start) {
                             sequence.start();
                         }
                     });
 
+                    // トランスポートを開始
                     Tone.Transport.start();
                     setIsPlaying(true);
+                    setError('');
                 } catch (error) {
                     console.error('Play error:', error);
-                    setError('再生に失敗しました。');
+                    setError(`再生に失敗しました: ${error.message}`);
                 }
             };
 
