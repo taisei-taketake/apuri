@@ -477,7 +477,7 @@
                     }
                 },
                 lead: {
-                    emoji: '🎺',
+                    emoji: '�',
                     name: 'Lead',
                     synthType: 'MonoSynth',
                     config: {
@@ -876,6 +876,12 @@
                     return;
                 }
 
+                // シーケンスがまだ生成されていない場合、再生をブロックしエラーを表示
+                if (sequences.length === 0) {
+                    setError('まず「生成して再生」ボタンで音楽を生成してください。');
+                    return;
+                }
+
                 // Tone.js コンテキストが初期化されていない場合、初期化
                 if (!isInitialized) {
                     try {
@@ -1062,7 +1068,7 @@
                             <button
                                 className={`play-button ${isPlaying ? 'active' : ''}`}
                                 onClick={startMusic}
-                                disabled={isGenerating} // 生成中は再生/停止ボタンも無効
+                                disabled={isGenerating || (!isPlaying && sequences.length === 0)}
                             >
                                 {isPlaying ? '■ STOP' : '▶ PLAY'}
                             </button>
@@ -1146,3 +1152,4 @@
     </script>
 </body>
 </html>
+�
