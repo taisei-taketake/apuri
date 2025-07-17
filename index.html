@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI BGM Generator - 多様な楽器音対応</title>
+    <title>AI BGM Generator - 感情に基づく音楽生成</title>
     <!-- Tone.js for audio synthesis -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <!-- React and ReactDOM for UI -->
@@ -21,24 +21,24 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* グラデーション背景 */
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
             min-height: 100vh;
-            display: flex; /* 中央寄せのため */
-            justify-content: center; /* 中央寄せのため */
-            align-items: center; /* 中央寄せのため */
-            padding: 20px; /* 全体のパディング */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
         .container {
             width: 100%;
-            max-width: 1000px; /* 最大幅を設定 */
-            min-height: 90vh; /* 最小高さを設定 */
-            backdrop-filter: blur(10px); /* 背景のぼかし */
-            background: rgba(0, 0, 0, 0.3); /* 半透明の背景 */
-            border-radius: 20px; /* 丸みを帯びた角 */
-            overflow: hidden; /* 角丸に合わせたコンテンツのクリップ */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* 影 */
+            max-width: 1200px;
+            min-height: 90vh;
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
         }
@@ -53,7 +53,7 @@
         .title {
             font-size: 32px;
             font-weight: 800;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4); /* カラフルなグラデーションテキスト */
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -68,13 +68,13 @@
 
         .content {
             padding: 30px 20px;
-            flex-grow: 1; /* 残りのスペースを占める */
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
-            gap: 25px; /* セクション間のスペース */
+            gap: 25px;
         }
 
-        .ai-section, .instruments-section {
+        .emotion-section, .ai-section, .instruments-section {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             padding: 25px;
@@ -83,10 +83,10 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .ai-title, .section-title {
+        .emotion-title, .ai-title, .section-title {
             font-size: 20px;
             font-weight: 700;
-            color: #4ecdc4; /* アクセントカラー */
+            color: #4ecdc4;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
@@ -101,6 +101,81 @@
             margin-bottom: 25px;
         }
 
+        .emotion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .emotion-card {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .emotion-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .emotion-card.selected {
+            border-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.2);
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.4);
+            transform: scale(1.05);
+        }
+
+        .emotion-emoji {
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .emotion-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .emotion-description {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.4;
+        }
+
+        .emotion-input-section {
+            margin-bottom: 20px;
+        }
+
+        .emotion-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .emotion-input:focus {
+            border-color: #4ecdc4;
+            box-shadow: 0 0 15px rgba(78, 205, 196, 0.3);
+        }
+
+        .emotion-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
         .ai-controls {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -109,15 +184,15 @@
         }
 
         .ai-button {
-            background: linear-gradient(45deg, #ff6b6b, #ee5a24); /* ボタンのグラデーション */
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
             color: white;
             border: none;
             padding: 15px 25px;
-            border-radius: 50px; /* 丸みを帯びたボタン */
+            border-radius: 50px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s; /* ホバーエフェクト */
+            transition: all 0.3s;
             box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
         }
 
@@ -140,6 +215,16 @@
             box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
         }
 
+        .ai-button.emotion-based {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+            color: #333;
+        }
+
+        .ai-button.emotion-based:hover:not(:disabled) {
+            box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
+        }
+
         .play-button {
             background: linear-gradient(45deg, #667eea, #764ba2);
             color: #fff;
@@ -150,7 +235,7 @@
             font-weight: 700;
             cursor: pointer;
             width: 100%;
-            margin-top: 20px; /* AI Controlsの下にスペース */
+            margin-top: 20px;
             transition: all 0.3s;
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
@@ -166,7 +251,7 @@
         }
 
         .play-button.active {
-            background: linear-gradient(45deg, #ff6b6b, #ee5a24); /* 停止中の色 */
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
             box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
         }
 
@@ -203,11 +288,11 @@
         }
 
         .info-value.playing {
-            color: #4ecdc4; /* 再生中の色 */
+            color: #4ecdc4;
         }
 
         .info-value.stopped {
-            color: #ff6b6b; /* 停止中の色 */
+            color: #ff6b6b;
         }
 
         .parameter-grid {
@@ -246,7 +331,7 @@
 
         .instrument-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* 小さな画面ではより多く表示 */
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             gap: 15px;
             margin-top: 20px;
         }
@@ -261,14 +346,14 @@
         }
 
         .instrument-card.active {
-            background: rgba(78, 205, 196, 0.3); /* アクティブな楽器の色 */
+            background: rgba(78, 205, 196, 0.3);
             border-color: #4ecdc4;
             box-shadow: 0 0 15px rgba(78, 205, 196, 0.5);
             transform: scale(1.05);
         }
 
         .instrument-emoji {
-            font-size: 28px; /* 絵文字を少し大きく */
+            font-size: 28px;
             margin-bottom: 8px;
         }
 
@@ -339,19 +424,40 @@
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background: #4ecdc4; /* スタンバイ時の色 */
-            animation: none; /* デフォルトではアニメーションなし */
+            background: #4ecdc4;
+            animation: none;
         }
 
         .ai-indicator.generating {
-            background: #ff6b6b; /* 生成中の色 */
-            animation: pulse 0.8s infinite; /* 生成中のアニメーション */
+            background: #ff6b6b;
+            animation: pulse 0.8s infinite;
         }
 
         @keyframes pulse {
             0% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.5; transform: scale(1.2); }
             100% { opacity: 1; transform: scale(1); }
+        }
+
+        .current-emotion {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .current-emotion-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 5px;
+        }
+
+        .current-emotion-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #4ecdc4;
         }
 
         /* レスポンシブデザイン */
@@ -375,13 +481,16 @@
                 padding: 20px 15px;
             }
             .ai-controls {
-                grid-template-columns: 1fr; /* スマホではボタンを縦に並べる */
+                grid-template-columns: 1fr;
             }
             .parameter-grid {
-                grid-template-columns: 1fr 1fr; /* スマホでは2列 */
+                grid-template-columns: 1fr 1fr;
             }
             .instrument-grid {
-                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* スマホではさらに小さく */
+                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            }
+            .emotion-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             }
             .instrument-emoji {
                 font-size: 24px;
@@ -401,6 +510,8 @@
         const AIBGMGenerator = () => {
             const [isPlaying, setIsPlaying] = useState(false);
             const [isGenerating, setIsGenerating] = useState(false);
+            const [selectedEmotion, setSelectedEmotion] = useState('');
+            const [customEmotion, setCustomEmotion] = useState('');
             const [currentParameters, setCurrentParameters] = useState({
                 genre: 'AI生成中...',
                 mood: 'AI生成中...',
@@ -411,24 +522,148 @@
                 harmony: 0.7,
                 rhythm: 0.6,
                 melody: 0.8,
-                instruments: []
+                instruments: [],
+                emotion: ''
             });
             const [creativityLevel, setCreativityLevel] = useState(0.7);
-            const [instruments, setInstruments] = useState({}); // Tone.js 楽器インスタンスを保持
-            const [sequences, setSequences] = useState([]); // Tone.js シーケンスインスタンスを保持
+            const [instruments, setInstruments] = useState({});
+            const [sequences, setSequences] = useState([]);
             const [error, setError] = useState('');
-            const [isInitialized, setIsInitialized] = useState(false); // Tone.js の初期化状態
-            const [aiStatus, setAiStatus] = useState('standby'); // 'standby', 'generating', 'playing', 'error'
-            const [activeInstruments, setActiveInstruments] = useState([]); // 現在使用中の楽器名リスト
+            const [isInitialized, setIsInitialized] = useState(false);
+            const [aiStatus, setAiStatus] = useState('standby');
+            const [activeInstruments, setActiveInstruments] = useState([]);
 
-            // エフェクトの useRef
             const reverb = useRef(null);
             const delay = useRef(null);
             const filter = useRef(null);
             const distortion = useRef(null);
             const chorus = useRef(null);
 
-            // 楽器定義: 絵文字、名前、Tone.js シンセ設定
+            // 感情データ
+            const emotions = {
+                happy: {
+                    emoji: '😊',
+                    name: '幸せ',
+                    description: '明るく楽しい気分',
+                    musicParams: {
+                        tempo: [120, 160],
+                        key: ['C', 'G', 'D', 'A'],
+                        scale: ['major', 'mixolydian'],
+                        complexity: [0.3, 0.7],
+                        harmony: [0.6, 0.9],
+                        rhythm: [0.6, 0.9],
+                        melody: [0.7, 1.0],
+                        instruments: ['piano', 'guitar', 'bells', 'strings']
+                    }
+                },
+                sad: {
+                    emoji: '😢',
+                    name: '悲しい',
+                    description: '寂しく物悲しい気分',
+                    musicParams: {
+                        tempo: [60, 100],
+                        key: ['Am', 'Dm', 'Em', 'Fm'],
+                        scale: ['minor', 'harmonic_minor'],
+                        complexity: [0.2, 0.5],
+                        harmony: [0.4, 0.7],
+                        rhythm: [0.3, 0.6],
+                        melody: [0.5, 0.8],
+                        instruments: ['piano', 'strings', 'pad', 'bells']
+                    }
+                },
+                angry: {
+                    emoji: '😠',
+                    name: '怒り',
+                    description: '激しく燃える気分',
+                    musicParams: {
+                        tempo: [140, 180],
+                        key: ['Em', 'Am', 'Dm', 'Gm'],
+                        scale: ['minor', 'phrygian'],
+                        complexity: [0.7, 1.0],
+                        harmony: [0.3, 0.6],
+                        rhythm: [0.8, 1.0],
+                        melody: [0.6, 0.9],
+                        instruments: ['guitar', 'bass', 'drums', 'lead']
+                    }
+                },
+                calm: {
+                    emoji: '😌',
+                    name: '穏やか',
+                    description: '平和で落ち着いた気分',
+                    musicParams: {
+                        tempo: [70, 100],
+                        key: ['C', 'F', 'G', 'Am'],
+                        scale: ['major', 'dorian'],
+                        complexity: [0.2, 0.4],
+                        harmony: [0.7, 0.9],
+                        rhythm: [0.4, 0.6],
+                        melody: [0.6, 0.8],
+                        instruments: ['piano', 'pad', 'strings', 'bells']
+                    }
+                },
+                excited: {
+                    emoji: '🤩',
+                    name: '興奮',
+                    description: 'エネルギッシュで活発な気分',
+                    musicParams: {
+                        tempo: [130, 170],
+                        key: ['C', 'G', 'D', 'E'],
+                        scale: ['major', 'mixolydian'],
+                        complexity: [0.6, 0.9],
+                        harmony: [0.6, 0.8],
+                        rhythm: [0.7, 1.0],
+                        melody: [0.7, 1.0],
+                        instruments: ['guitar', 'bass', 'drums', 'lead', 'piano']
+                    }
+                },
+                mysterious: {
+                    emoji: '🤔',
+                    name: '神秘的',
+                    description: '謎めいて不思議な気分',
+                    musicParams: {
+                        tempo: [80, 120],
+                        key: ['Dm', 'Em', 'F#m', 'Gm'],
+                        scale: ['minor', 'phrygian', 'whole_tone'],
+                        complexity: [0.4, 0.8],
+                        harmony: [0.3, 0.6],
+                        rhythm: [0.4, 0.7],
+                        melody: [0.5, 0.8],
+                        instruments: ['pad', 'bells', 'strings', 'lead']
+                    }
+                },
+                romantic: {
+                    emoji: '💕',
+                    name: 'ロマンチック',
+                    description: '愛情に満ちた温かい気分',
+                    musicParams: {
+                        tempo: [90, 120],
+                        key: ['C', 'F', 'G', 'Am'],
+                        scale: ['major', 'minor'],
+                        complexity: [0.3, 0.6],
+                        harmony: [0.7, 0.9],
+                        rhythm: [0.5, 0.7],
+                        melody: [0.7, 0.9],
+                        instruments: ['piano', 'strings', 'pad', 'bells']
+                    }
+                },
+                energetic: {
+                    emoji: '⚡',
+                    name: 'エネルギッシュ',
+                    description: 'パワフルで力強い気分',
+                    musicParams: {
+                        tempo: [140, 180],
+                        key: ['E', 'A', 'D', 'G'],
+                        scale: ['major', 'mixolydian'],
+                        complexity: [0.6, 0.9],
+                        harmony: [0.5, 0.8],
+                        rhythm: [0.8, 1.0],
+                        melody: [0.6, 0.9],
+                        instruments: ['guitar', 'bass', 'drums', 'lead']
+                    }
+                }
+            };
+
+            // 楽器定義
             const instrumentDefinitions = {
                 piano: {
                     emoji: '🎹',
@@ -449,7 +684,7 @@
                     }
                 },
                 bass: {
-                    emoji: '🎶', // ベースに合った絵文字がなかったので一般的な音符
+                    emoji: '🎶',
                     name: 'Bass',
                     synthType: 'MonoSynth',
                     config: {
@@ -469,7 +704,7 @@
                 drums: {
                     emoji: '🥁',
                     name: 'Drums',
-                    synthType: 'DrumSet', // 特別なタイプとして扱う
+                    synthType: 'DrumSet',
                     config: {
                         kick: { pitchDecay: 0.05, octaves: 10, envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 0.7 } },
                         snare: { noise: { type: 'white' }, envelope: { attack: 0.001, decay: 0.2, sustain: 0 } },
@@ -486,7 +721,7 @@
                     }
                 },
                 pad: {
-                    emoji: '🌊', // パッドの広がりを表現
+                    emoji: '🌊',
                     name: 'Pad',
                     synthType: 'PolySynth',
                     config: {
@@ -505,10 +740,12 @@
                 }
             };
 
-            // AI音楽生成ロジックをカプセル化するクラス
+            // AI音楽生成ロジック
             class AIComposer {
                 constructor() {
-                    this.creativityLevel = 0.7; // 創造性レベル
+                    this.creativityLevel = 0.7;
+                    this.selectedEmotion = null;
+                    this.customEmotion = '';
                     this.musicalKnowledge = {
                         keys: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
                         scales: {
@@ -533,624 +770,860 @@
                             ambient: ['pad', 'bells', 'strings'],
                             experimental: ['lead', 'pad', 'bells', 'guitar'],
                             world: ['bells', 'strings', 'drums', 'pad'],
-                            cinematic: ['strings', 'pad', 'bells', 'piano']
+                            cinematic: ['strings', 'pad', 'piano', 'bells']
                         }
+                    };
+                    this.chordProgressions = {
+                        major: [
+                            [0, 3, 5, 0], // I-vi-IV-I
+                            [0, 5, 3, 4], // I-V-vi-IV
+                            [0, 4, 3, 5], // I-IV-vi-V
+                            [0, 2, 3, 5], // I-ii-vi-V
+                            [0, 6, 4, 5]  // I-vii-IV-V
+                        ],
+                        minor: [
+                            [0, 6, 3, 4], // i-VI-III-IV
+                            [0, 4, 5, 0], // i-iv-v-i
+                            [0, 2, 5, 0], // i-ii-v-i
+                            [0, 6, 4, 5], // i-VI-iv-V
+                            [0, 3, 6, 4]  // i-III-VI-iv
+                        ]
                     };
                 }
 
-                // 創造性レベルを設定
-                setCreativity(level) {
-                    this.creativityLevel = Math.max(0, Math.min(1, level));
+                setCreativityLevel(level) {
+                    this.creativityLevel = level;
                 }
 
-                // ランダムな音楽パラメータを生成
-                generateRandomParameters() {
+                setEmotion(emotion, custom = '') {
+                    this.selectedEmotion = emotion;
+                    this.customEmotion = custom;
+                }
+
+                generateRandomValue(min, max) {
+                    return Math.random() * (max - min) + min;
+                }
+
+                selectWeightedRandom(array, weights = null) {
+                    if (!weights) {
+                        return array[Math.floor(Math.random() * array.length)];
+                    }
+                    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+                    let randomValue = Math.random() * totalWeight;
+                    
+                    for (let i = 0; i < array.length; i++) {
+                        randomValue -= weights[i];
+                        if (randomValue <= 0) {
+                            return array[i];
+                        }
+                    }
+                    return array[array.length - 1];
+                }
+
+                analyzeEmotionParameters() {
+                    let emotionData = null;
+                    
+                    if (this.selectedEmotion && emotions[this.selectedEmotion]) {
+                        emotionData = emotions[this.selectedEmotion].musicParams;
+                    } else if (this.customEmotion) {
+                        // カスタム感情の分析（簡単な感情分析）
+                        emotionData = this.analyzeCustomEmotion(this.customEmotion);
+                    }
+                    
+                    return emotionData;
+                }
+
+                analyzeCustomEmotion(emotionText) {
+                    const text = emotionText.toLowerCase();
+                    
+                    // 簡単なキーワード分析
+                    const positiveWords = ['happy', 'joy', 'bright', 'cheerful', 'upbeat', '明るい', '楽しい', '嬉しい'];
+                    const negativeWords = ['sad', 'dark', 'melancholy', 'depressed', '悲しい', '暗い', '憂鬱'];
+                    const energeticWords = ['energetic', 'fast', 'powerful', 'intense', 'エネルギッシュ', '激しい', '力強い'];
+                    const calmWords = ['calm', 'peaceful', 'relaxed', 'gentle', '穏やか', '平和', 'リラックス'];
+                    
+                    let isPositive = positiveWords.some(word => text.includes(word));
+                    let isNegative = negativeWords.some(word => text.includes(word));
+                    let isEnergetic = energeticWords.some(word => text.includes(word));
+                    let isCalm = calmWords.some(word => text.includes(word));
+                    
+                    // デフォルトパラメータ
+                    let params = {
+                        tempo: [100, 130],
+                        key: ['C', 'Am', 'G', 'Em'],
+                        scale: ['major', 'minor'],
+                        complexity: [0.4, 0.7],
+                        harmony: [0.5, 0.8],
+                        rhythm: [0.5, 0.7],
+                        melody: [0.6, 0.8],
+                        instruments: ['piano', 'strings', 'pad']
+                    };
+                    
+                    // 感情に基づいた調整
+                    if (isPositive) {
+                        params.tempo = [120, 160];
+                        params.key = ['C', 'G', 'D', 'A'];
+                        params.scale = ['major', 'mixolydian'];
+                        params.melody = [0.7, 1.0];
+                        params.instruments = ['piano', 'guitar', 'bells', 'strings'];
+                    }
+                    
+                    if (isNegative) {
+                        params.tempo = [60, 100];
+                        params.key = ['Am', 'Dm', 'Em', 'Fm'];
+                        params.scale = ['minor', 'harmonic_minor'];
+                        params.harmony = [0.4, 0.7];
+                        params.instruments = ['piano', 'strings', 'pad'];
+                    }
+                    
+                    if (isEnergetic) {
+                        params.tempo = [140, 180];
+                        params.rhythm = [0.7, 1.0];
+                        params.complexity = [0.6, 0.9];
+                        params.instruments = ['guitar', 'bass', 'drums', 'lead'];
+                    }
+                    
+                    if (isCalm) {
+                        params.tempo = [70, 100];
+                        params.rhythm = [0.3, 0.6];
+                        params.complexity = [0.2, 0.5];
+                        params.instruments = ['piano', 'pad', 'strings', 'bells'];
+                    }
+                    
+                    return params;
+                }
+
+                generateMusicParameters() {
+                    const emotionParams = this.analyzeEmotionParameters();
                     const creativity = this.creativityLevel;
-
-                    const key = this.musicalKnowledge.keys[Math.floor(Math.random() * this.musicalKnowledge.keys.length)];
-                    const scaleTypes = Object.keys(this.musicalKnowledge.scales);
-                    const scale = scaleTypes[Math.floor(Math.random() * scaleTypes.length)];
-
-                    // 創造性に応じてテンポの範囲を広げる
-                    const tempoRange = creativity > 0.7 ? [60, 180] : [80, 140];
-                    const tempo = Math.floor(Math.random() * (tempoRange[1] - tempoRange[0])) + tempoRange[0];
-
-                    const genre = this.musicalKnowledge.genres[Math.floor(Math.random() * this.musicalKnowledge.genres.length)];
-                    const mood = this.musicalKnowledge.moods[Math.floor(Math.random() * this.musicalKnowledge.moods.length)];
-
-                    // ジャンルに基づいて楽器を選択、またはランダムに選択
-                    let instruments = [...(this.musicalKnowledge.instrumentCombinations[genre] || [])];
-                    if (instruments.length === 0 || Math.random() < creativity * 0.3) { // 創造性に応じてジャンル固有でない楽器も選ぶ
-                        const availableInstruments = Object.keys(instrumentDefinitions);
-                        const numInstruments = Math.floor(Math.random() * 4) + 2; // 2〜5個の楽器
-                        instruments = [];
-                        for (let i = 0; i < numInstruments; i++) {
-                            const instrument = availableInstruments[Math.floor(Math.random() * availableInstruments.length)];
-                            if (!instruments.includes(instrument)) {
-                                instruments.push(instrument);
-                            }
-                        }
-                    }
-
-                    // 創造性が高い場合は追加の楽器を加える
-                    if (creativity > 0.8 && instruments.length < 5) {
-                        const additionalInstruments = Object.keys(instrumentDefinitions).filter(i => !instruments.includes(i));
-                        if (additionalInstruments.length > 0) {
-                            instruments.push(additionalInstruments[Math.floor(Math.random() * additionalInstruments.length)]);
-                        }
-                    }
-                    // 重複を削除してユニークな楽器リストにする
-                    instruments = [...new Set(instruments)];
-
-                    const complexity = Math.random() * creativity; // 創造性に応じて複雑性を調整
-                    const harmony = Math.random();
-                    const rhythm = Math.random();
-                    const melody = Math.random();
-
-                    return {
-                        genre,
-                        mood,
-                        tempo,
-                        key,
-                        scale,
-                        complexity,
-                        harmony,
-                        rhythm,
-                        melody,
-                        instruments
+                    
+                    let parameters = {
+                        genre: this.selectWeightedRandom(this.musicalKnowledge.genres),
+                        mood: this.selectWeightedRandom(this.musicalKnowledge.moods),
+                        tempo: 120,
+                        key: 'C',
+                        scale: 'major',
+                        complexity: 0.5,
+                        harmony: 0.7,
+                        rhythm: 0.6,
+                        melody: 0.8,
+                        instruments: [],
+                        emotion: this.selectedEmotion || this.customEmotion || 'neutral'
                     };
-                }
-
-                // 指定されたキーとスケールに基づいて音符のリストを生成
-                generateScaleNotes(key, scaleType, octaves = [3, 4, 5]) {
-                    const keyIndex = this.musicalKnowledge.keys.indexOf(key);
-                    const scaleIntervals = this.musicalKnowledge.scales[scaleType];
-                    const notes = [];
-
-                    octaves.forEach(octave => {
-                        scaleIntervals.forEach(interval => {
-                            const noteIndex = (keyIndex + interval) % 12;
-                            const noteName = this.musicalKnowledge.keys[noteIndex];
-                            notes.push(noteName + octave);
-                        });
-                    });
-                    return notes;
-                }
-
-                // 各楽器のパート（音符やパターン）を生成
-                generateInstrumentParts(parameters) {
-                    const { key, scale, complexity, instruments, rhythm, melody, harmony } = parameters;
-                    const scaleNotes = this.generateScaleNotes(key, scale);
-                    const parts = {};
-
-                    instruments.forEach(instrument => {
-                        switch (instrument) {
-                            case 'piano':
-                            case 'guitar':
-                            case 'lead':
-                                parts[instrument] = this.generateMelody(scaleNotes, complexity, melody);
-                                break;
-                            case 'bass':
-                                parts[instrument] = this.generateBassLine(scaleNotes, complexity, rhythm);
-                                break;
-                            case 'strings':
-                            case 'pad':
-                                parts[instrument] = this.generateHarmony(scaleNotes, complexity, harmony);
-                                break;
-                            case 'bells':
-                                parts[instrument] = this.generateBellsPart(scaleNotes, complexity);
-                                break;
-                            case 'drums':
-                                parts[instrument] = this.generateDrumPattern(complexity, rhythm);
-                                break;
-                        }
-                    });
-                    return parts;
-                }
-
-                // メロディパートを生成
-                generateMelody(scaleNotes, complexity, melodyFactor) {
-                    const melodyLength = Math.floor(8 + (complexity * 16)); // 複雑性に応じて長さを調整
-                    const melody = [];
-                    let currentNoteIndex = Math.floor(Math.random() * scaleNotes.length);
-
-                    for (let i = 0; i < melodyLength; i++) {
-                        // 一定の確率で休符を入れる
-                        if (Math.random() < (1 - melodyFactor) * 0.2) {
-                            melody.push(null);
-                            continue;
-                        }
-
-                        melody.push(scaleNotes[currentNoteIndex]);
-
-                        // 複雑性に応じて音程の跳躍を大きくする
-                        const stepRange = Math.ceil(complexity * 5) + 1;
-                        const direction = Math.random() < 0.5 ? -1 : 1;
-                        const stepSize = Math.floor(Math.random() * stepRange) + 1;
-
-                        currentNoteIndex = Math.max(0, Math.min(scaleNotes.length - 1,
-                            currentNoteIndex + (direction * stepSize)));
-
-                        // 創造性に応じてランダムな音程にジャンプ
-                        if (Math.random() < complexity * 0.3) {
-                            currentNoteIndex = Math.floor(Math.random() * scaleNotes.length);
-                        }
+                    
+                    if (emotionParams) {
+                        // 感情に基づいたパラメータ生成
+                        parameters.tempo = Math.round(this.generateRandomValue(emotionParams.tempo[0], emotionParams.tempo[1]));
+                        parameters.key = this.selectWeightedRandom(emotionParams.key);
+                        parameters.scale = this.selectWeightedRandom(emotionParams.scale);
+                        parameters.complexity = this.generateRandomValue(emotionParams.complexity[0], emotionParams.complexity[1]);
+                        parameters.harmony = this.generateRandomValue(emotionParams.harmony[0], emotionParams.harmony[1]);
+                        parameters.rhythm = this.generateRandomValue(emotionParams.rhythm[0], emotionParams.rhythm[1]);
+                        parameters.melody = this.generateRandomValue(emotionParams.melody[0], emotionParams.melody[1]);
+                        parameters.instruments = this.selectInstruments(emotionParams.instruments, creativity);
+                    } else {
+                        // クリエイティビティに基づいたランダム生成
+                        parameters.tempo = Math.round(this.generateRandomValue(80, 160));
+                        parameters.key = this.selectWeightedRandom(this.musicalKnowledge.keys);
+                        parameters.scale = this.selectWeightedRandom(Object.keys(this.musicalKnowledge.scales));
+                        parameters.complexity = this.generateRandomValue(0.2, 0.9);
+                        parameters.harmony = this.generateRandomValue(0.3, 0.9);
+                        parameters.rhythm = this.generateRandomValue(0.3, 0.9);
+                        parameters.melody = this.generateRandomValue(0.5, 1.0);
+                        parameters.instruments = this.selectInstruments(Object.keys(instrumentDefinitions), creativity);
                     }
+                    
+                    // クリエイティビティレベルに基づいた調整
+                    if (creativity > 0.7) {
+                        // 高クリエイティビティ：より実験的な要素を追加
+                        if (Math.random() < 0.3) {
+                            parameters.scale = this.selectWeightedRandom(['whole_tone', 'phrygian', 'lydian']);
+                        }
+                        parameters.complexity = Math.min(1.0, parameters.complexity + 0.2);
+                    }
+                    
+                    return parameters;
+                }
+
+                selectInstruments(availableInstruments, creativity) {
+                    const numInstruments = Math.floor(creativity * 5) + 2; // 2-6 instruments
+                    const selected = [];
+                    
+                    // 基本的な楽器を選択
+                    const shuffled = [...availableInstruments].sort(() => 0.5 - Math.random());
+                    
+                    for (let i = 0; i < Math.min(numInstruments, shuffled.length); i++) {
+                        selected.push(shuffled[i]);
+                    }
+                    
+                    return selected;
+                }
+
+                generateChordProgression(key, scale, length = 4) {
+                    const scaleNotes = this.musicalKnowledge.scales[scale] || this.musicalKnowledge.scales.major;
+                    const keyIndex = this.musicalKnowledge.keys.indexOf(key);
+                    
+                    const progressions = scale.includes('minor') ? 
+                        this.chordProgressions.minor : 
+                        this.chordProgressions.major;
+                    
+                    const progression = this.selectWeightedRandom(progressions);
+                    const chords = [];
+                    
+                    for (let i = 0; i < length; i++) {
+                        const chordRoot = progression[i % progression.length];
+                        const chordNotes = [];
+                        
+                        // トライアドを構築
+                        for (let j = 0; j < 3; j++) {
+                            const noteIndex = (keyIndex + scaleNotes[chordRoot] + scaleNotes[j * 2]) % 12;
+                            chordNotes.push(this.musicalKnowledge.keys[noteIndex]);
+                        }
+                        
+                        chords.push(chordNotes);
+                    }
+                    
+                    return chords;
+                }
+
+                generateMelody(key, scale, length = 16) {
+                    const scaleNotes = this.musicalKnowledge.scales[scale] || this.musicalKnowledge.scales.major;
+                    const keyIndex = this.musicalKnowledge.keys.indexOf(key);
+                    const melody = [];
+                    
+                    for (let i = 0; i < length; i++) {
+                        const scaleStep = Math.floor(Math.random() * scaleNotes.length);
+                        const noteIndex = (keyIndex + scaleNotes[scaleStep]) % 12;
+                        const octave = Math.floor(Math.random() * 2) + 4; // オクターブ4-5
+                        
+                        melody.push({
+                            note: this.musicalKnowledge.keys[noteIndex] + octave,
+                            duration: this.selectWeightedRandom(['8n', '4n', '4n', '2n'], [0.4, 0.4, 0.15, 0.05]),
+                            velocity: this.generateRandomValue(0.5, 1.0)
+                        });
+                    }
+                    
                     return melody;
                 }
 
-                // ベースラインを生成
-                generateBassLine(scaleNotes, complexity, rhythmFactor) {
-                    // 低いオクターブの音符のみを使用
-                    const bassNotes = scaleNotes.filter(note => note.includes('2') || note.includes('3'));
-                    if (bassNotes.length === 0) bassNotes.push(scaleNotes[0]); // fallback
-                    const bassLength = Math.floor(4 + (complexity * 8));
-                    const bassLine = [];
-
-                    for (let i = 0; i < bassLength; i++) {
-                        // リズムファクターに応じて休符を入れる
-                        if (Math.random() < (1 - rhythmFactor) * 0.3) {
-                            bassLine.push(null);
-                            continue;
-                        }
-                        bassLine.push(bassNotes[Math.floor(Math.random() * bassNotes.length)]);
-                    }
-                    return bassLine;
-                }
-
-                // ハーモニー（和音）パートを生成
-                generateHarmony(scaleNotes, complexity, harmonyFactor) {
-                    const chordLength = Math.floor(4 + (complexity * 8));
-                    const harmony = [];
-
-                    for (let i = 0; i < chordLength; i++) {
-                        // ハーモニーファクターに応じて休符を入れる
-                        if (Math.random() < (1 - harmonyFactor) * 0.1) {
-                            harmony.push(null);
-                            continue;
-                        }
-
-                        const chordSize = Math.floor(3 + (complexity * 2)); // 複雑性に応じて和音の音数を調整
-                        const chord = [];
-                        let rootIndex = Math.floor(Math.random() * scaleNotes.length);
-
-                        for (let j = 0; j < chordSize; j++) {
-                            // 和音の音程を生成 (例: 根音から3度ずつ積む)
-                            chord.push(scaleNotes[rootIndex]);
-                            rootIndex = (rootIndex + 2) % scaleNotes.length; // 3度
-                        }
-                        harmony.push(chord);
-                    }
-                    return harmony;
-                }
-
-                // ベルパートを生成 (まばらに高音を配置)
-                generateBellsPart(scaleNotes, complexity) {
-                    const bellsLength = Math.floor(4 + (complexity * 6));
-                    const bellsPart = [];
-                    const highNotes = scaleNotes.filter(note => note.includes('5') || note.includes('6'));
-                    if (highNotes.length === 0) highNotes.push(scaleNotes[scaleNotes.length - 1]); // fallback
-
-                    for (let i = 0; i < bellsLength; i++) {
-                        if (Math.random() < 0.3 + (complexity * 0.2)) { // 複雑性に応じて音を増やす
-                            bellsPart.push(highNotes[Math.floor(Math.random() * highNotes.length)]);
-                        } else {
-                            bellsPart.push(null); // 休符
-                        }
-                    }
-                    return bellsPart;
-                }
-
-                // ドラムパターンを生成
-                generateDrumPattern(complexity, rhythmFactor) {
-                    const patternLength = 16; // 1小節の16分音符数
-                    const pattern = [];
-
-                    for (let i = 0; i < patternLength; i++) {
-                        const drumHits = [];
-
-                        // キック (1拍目と3拍目、リズムファクターに応じて)
-                        if (i % 8 === 0 && Math.random() < rhythmFactor) {
-                            drumHits.push('kick');
-                        }
-                        // スネア (2拍目と4拍目、リズムファクターに応じて)
-                        if (i % 8 === 4 && Math.random() < rhythmFactor * 0.8) {
-                            drumHits.push('snare');
-                        }
-                        // ハイハット (頻繁に、リズムファクターと複雑性に応じて)
-                        if (Math.random() < rhythmFactor * 0.6 + complexity * 0.2) {
-                            drumHits.push('hihat');
-                        }
-
-                        pattern.push(drumHits);
-                    }
-                    return pattern;
-                }
-
-                // 音楽全体を構成
-                compose(creativityLevel = 0.7) {
-                    this.setCreativity(creativityLevel);
-
-                    const parameters = this.generateRandomParameters();
-                    const parts = this.generateInstrumentParts(parameters);
-
-                    return {
-                        parameters,
-                        parts
+                generateRhythm(complexity, length = 16) {
+                    const rhythm = [];
+                    const patterns = {
+                        simple: [1, 0, 1, 0, 1, 0, 1, 0],
+                        medium: [1, 0, 1, 1, 0, 1, 0, 1],
+                        complex: [1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0]
                     };
+                    
+                    let pattern;
+                    if (complexity < 0.4) {
+                        pattern = patterns.simple;
+                    } else if (complexity < 0.7) {
+                        pattern = patterns.medium;
+                    } else {
+                        pattern = patterns.complex;
+                    }
+                    
+                    for (let i = 0; i < length; i++) {
+                        rhythm.push(pattern[i % pattern.length]);
+                    }
+                    
+                    return rhythm;
+                }
+
+                async generateComposition(parameters) {
+                    const composition = {
+                        chords: this.generateChordProgression(parameters.key, parameters.scale, 8),
+                        melody: this.generateMelody(parameters.key, parameters.scale, 16),
+                        rhythm: this.generateRhythm(parameters.complexity, 16),
+                        bassline: this.generateMelody(parameters.key, parameters.scale, 8),
+                        parameters: parameters
+                    };
+                    
+                    return composition;
                 }
             }
 
-            const aiComposer = useRef(new AIComposer());
+            // エフェクトの初期化
+            const initializeEffects = () => {
+                try {
+                    reverb.current = new Tone.Reverb(2).toDestination();
+                    delay.current = new Tone.PingPongDelay("8n", 0.2).toDestination();
+                    filter.current = new Tone.Filter(2000, "lowpass").toDestination();
+                    distortion.current = new Tone.Distortion(0.4).toDestination();
+                    chorus.current = new Tone.Chorus(4, 2.5, 0.5).toDestination();
+                    
+                    return true;
+                } catch (error) {
+                    console.error('エフェクトの初期化エラー:', error);
+                    return false;
+                }
+            };
 
-            // コンポーネントがアンマウントされたときに音楽を停止し、Tone.jsをクリーンアップ
+            // 楽器の作成
+            const createInstruments = (instrumentList) => {
+                const createdInstruments = {};
+                
+                instrumentList.forEach(instrumentName => {
+                    try {
+                        const definition = instrumentDefinitions[instrumentName];
+                        if (!definition) return;
+                        
+                        let instrument;
+                        
+                        if (definition.synthType === 'DrumSet') {
+                            instrument = {
+                                kick: new Tone.MembraneSynth(definition.config.kick).connect(reverb.current),
+                                snare: new Tone.NoiseSynth(definition.config.snare).connect(reverb.current),
+                                hihat: new Tone.NoiseSynth(definition.config.hihat).connect(filter.current)
+                            };
+                        } else if (definition.synthType === 'PolySynth') {
+                            instrument = new Tone.PolySynth(Tone.Synth, definition.config).connect(reverb.current);
+                        } else if (definition.synthType === 'MonoSynth') {
+                            instrument = new Tone.MonoSynth(definition.config).connect(delay.current);
+                        }
+                        
+                        createdInstruments[instrumentName] = instrument;
+                    } catch (error) {
+                        console.error(`楽器 ${instrumentName} の作成エラー:`, error);
+                    }
+                });
+                
+                return createdInstruments;
+            };
+
+            // 音楽の再生
+            const playComposition = async (composition, instruments) => {
+                try {
+                    if (Tone.Transport.state === 'started') {
+                        Tone.Transport.stop();
+                        Tone.Transport.cancel();
+                    }
+                    
+                    const { chords, melody, rhythm, bassline, parameters } = composition;
+                    
+                    // テンポ設定
+                    Tone.Transport.bpm.value = parameters.tempo;
+                    
+                    // コード進行の再生
+                    if (instruments.piano) {
+                        const chordSeq = new Tone.Sequence((time, chord) => {
+                            chord.forEach((note, index) => {
+                                instruments.piano.triggerAttackRelease(note + "4", "2n", time + index * 0.01);
+                            });
+                        }, chords, "1n");
+                        
+                        chordSeq.start(0);
+                    }
+                    
+                    // メロディーの再生
+                    if (instruments.lead || instruments.guitar) {
+                        const melodyInstrument = instruments.lead || instruments.guitar;
+                        const melodySeq = new Tone.Sequence((time, note) => {
+                            if (note && note.note) {
+                                melodyInstrument.triggerAttackRelease(note.note, note.duration, time, note.velocity);
+                            }
+                        }, melody, "8n");
+                        
+                        melodySeq.start(0);
+                    }
+                    
+                    // ベースラインの再生
+                    if (instruments.bass) {
+                        const bassSeq = new Tone.Sequence((time, note) => {
+                            if (note && note.note) {
+                                const bassNote = note.note.replace(/\d+/, '2'); // オクターブを2に設定
+                                instruments.bass.triggerAttackRelease(bassNote, "4n", time);
+                            }
+                        }, bassline, "4n");
+                        
+                        bassSeq.start(0);
+                    }
+                    
+                    // ドラムパターンの再生
+                    if (instruments.drums) {
+                        const drumPattern = new Tone.Sequence((time, step) => {
+                            if (step) {
+                                instruments.drums.kick.triggerAttackRelease("C1", "8n", time);
+                            }
+                        }, rhythm, "8n");
+                        
+                        drumPattern.start(0);
+                        
+                        // スネアパターン
+                        const snarePattern = new Tone.Sequence((time, step) => {
+                            if (step % 4 === 2) {
+                                instruments.drums.snare.triggerAttackRelease("8n", time);
+                            }
+                        }, new Array(16).fill(1), "8n");
+                        
+                        snarePattern.start(0);
+                        
+                        // ハイハットパターン
+                        const hihatPattern = new Tone.Sequence((time, step) => {
+                            instruments.drums.hihat.triggerAttackRelease("16n", time);
+                        }, new Array(16).fill(1), "16n");
+                        
+                        hihatPattern.start(0);
+                    }
+                    
+                    // パッド/ストリングスの再生
+                    if (instruments.pad || instruments.strings) {
+                        const padInstrument = instruments.pad || instruments.strings;
+                        const padSeq = new Tone.Sequence((time, chord) => {
+                            chord.forEach((note, index) => {
+                                padInstrument.triggerAttackRelease(note + "3", "1n", time + index * 0.02);
+                            });
+                        }, chords, "2n");
+                        
+                        padSeq.start(0);
+                    }
+                    
+                    // ベルの再生
+                    if (instruments.bells) {
+                        const bellSeq = new Tone.Sequence((time, note) => {
+                            if (note && note.note && Math.random() < 0.3) {
+                                instruments.bells.triggerAttackRelease(note.note, "4n", time, 0.3);
+                            }
+                        }, melody, "4n");
+                        
+                        bellSeq.start(0);
+                    }
+                    
+                    // トランスポート開始
+                    Tone.Transport.start();
+                    
+                    return true;
+                } catch (error) {
+                    console.error('音楽再生エラー:', error);
+                    return false;
+                }
+            };
+
+            // AI作曲家のインスタンス
+            const aiComposer = new AIComposer();
+
+            // 初期化
             useEffect(() => {
-                return () => {
-                    stopMusic();
-                    if (Tone.context && Tone.context.state !== 'closed') {
-                        Tone.context.dispose();
-                        console.log('Tone.js context disposed on unmount.');
+                const initialize = async () => {
+                    try {
+                        if (initializeEffects()) {
+                            setIsInitialized(true);
+                            setError('');
+                        } else {
+                            setError('オーディオシステムの初期化に失敗しました。');
+                        }
+                    } catch (error) {
+                        setError('アプリケーションの初期化に失敗しました: ' + error.message);
                     }
                 };
+                
+                initialize();
             }, []);
 
-            // Tone.js 楽器インスタンスを作成するヘルパー関数
-            const createInstrument = (instrumentType, config) => {
-                try {
-                    let inst;
-                    switch (instrumentType) {
-                        case 'piano':
-                        case 'guitar':
-                        case 'strings':
-                        case 'pad':
-                        case 'bells':
-                            inst = new Tone.PolySynth(Tone.Synth, config);
-                            break;
-                        case 'bass':
-                        case 'lead':
-                            inst = new Tone.MonoSynth(config);
-                            break;
-                        case 'drums':
-                            // ドラムは複数のシンセをまとめる
-                            inst = {
-                                kick: new Tone.MembraneSynth(config.kick),
-                                snare: new Tone.NoiseSynth(config.snare),
-                                hihat: new Tone.NoiseSynth(config.hihat)
-                            };
-                            // 各ドラムパートをDestinationに接続
-                            inst.kick.toDestination();
-                            inst.snare.toDestination();
-                            inst.hihat.toDestination();
-                            return inst; // ドラムはここでリターン
-                        default:
-                            inst = new Tone.Synth(config);
-                            break;
-                    }
-                    inst.toDestination(); // 他の楽器は直接Destinationに接続
-                    return inst;
-                } catch (error) {
-                    console.error('Error creating instrument:', instrumentType, error);
-                    setError('楽器の作成に失敗しました: ' + instrumentType);
-                    return null;
-                }
-            };
-
-            // 楽器パートを再生するシーケンスを設定
-            // 修正点: instrumentInstance を引数として受け取る
-            const playInstrumentPart = (instrumentInstance, instrumentType, part, tempo) => {
-                // instrumentInstance を直接使用
-                if (!instrumentInstance || !part || part.length === 0) return null;
-
-                let sequence;
-                if (instrumentType === 'drums') {
-                    sequence = new Tone.Sequence((time, index) => {
-                        const hits = part[index % part.length];
-                        hits.forEach(hit => {
-                            // instrumentInstance の中の個別のドラムシンセを使用
-                            if (instrumentInstance[hit]) {
-                                instrumentInstance[hit].triggerAttackRelease('8n', time);
-                            }
-                        });
-                    }, Array.from({ length: part.length }, (_, i) => i), '16n');
-                } else {
-                    sequence = new Tone.Sequence((time, note) => {
-                        if (note) {
-                            if (Array.isArray(note)) { // 和音の場合
-                                instrumentInstance.triggerAttackRelease(note, '4n', time);
-                            } else { // 単音の場合
-                                instrumentInstance.triggerAttackRelease(note, '4n', time);
-                            }
-                        }
-                    }, part, '4n');
-                }
-                sequence.loop = true;
-                sequence.start(0); // すぐに開始
-                return sequence;
-            };
-
-            // 音楽の再生を開始
-            const startMusic = async () => {
-                if (isPlaying) {
-                    // 再生中なら停止
-                    stopMusic();
-                    return;
-                }
-
-                // シーケンスがまだ生成されていない場合、再生をブロックしエラーを表示
-                if (sequences.length === 0) {
-                    setError('まず「生成して再生」ボタンで音楽を生成してください。');
-                    return;
-                }
-
-                // Tone.js コンテキストが初期化されていない場合、初期化
-                if (!isInitialized) {
-                    try {
-                        await Tone.start();
-                        console.log('Tone.js context started');
-
-                        // エフェクトの初期化とDestinationへの接続
-                        reverb.current = new Tone.Reverb({ decay: 10, preDelay: 0.01 }).toDestination();
-                        delay.current = new Tone.FeedbackDelay('8n', 0.5).toDestination();
-                        filter.current = new Tone.Filter(1500, 'lowpass').toDestination();
-                        distortion.current = new Tone.Distortion(0.4).toDestination();
-                        chorus.current = new Tone.Chorus(4, 2.5, 0.5).toDestination();
-
-                        setIsInitialized(true);
-                    } catch (e) {
-                        setError('オーディオの初期化に失敗しました: ' + e.message);
-                        console.error(e);
-                        return;
-                    }
-                }
-
-                setIsPlaying(true);
-                Tone.Transport.start(); // Tone.js のトランスポートを開始
-                setAiStatus('playing');
-            };
-
-            // 音楽の停止
-            const stopMusic = () => {
-                setIsPlaying(false);
-                Tone.Transport.stop(); // Tone.js のトランスポートを停止
-                Tone.Transport.cancel(); // 全てのイベントをキャンセル
-
-                // 全てのシーケンスを破棄
-                sequences.forEach(seq => seq && seq.dispose());
-                setSequences([]);
-
-                // 全ての楽器を破棄
-                for (const instKey in instruments) {
-                    const inst = instruments[instKey];
-                    if (inst) {
-                        if (typeof inst.dispose === 'function') {
-                            inst.dispose();
-                        } else if (typeof inst === 'object' && instKey === 'drums') { // ドラムセットのように複数のシンセを持つ場合
-                            for (const drumPart in inst) {
-                                if (inst[drumPart] && typeof inst[drumPart].dispose === 'function') {
-                                    inst[drumPart].dispose();
-                                }
-                            }
-                        }
-                    }
-                }
-                setInstruments({}); // 楽器の状態をクリア
-                setAiStatus('standby');
-                console.log('Music stopped and instruments disposed.');
-            };
-
-            // AIによる音楽生成と再生
-            const generateAndPlayMusic = async (isCreative = false) => {
-                stopMusic(); // 現在の再生を停止し、リソースを解放
-
-                setIsGenerating(true);
+            // 感情選択
+            const handleEmotionSelect = (emotionKey) => {
+                setSelectedEmotion(emotionKey);
+                setCustomEmotion('');
                 setError('');
-                setAiStatus('generating');
-                setActiveInstruments([]); // 生成中はアクティブ楽器をクリア
+            };
 
+            // クリエイティブ生成
+            const handleCreativeGenerate = async () => {
+                if (!isInitialized) {
+                    setError('システムが初期化されていません。');
+                    return;
+                }
+                
                 try {
-                    // Tone.js コンテキストが初期化されていない場合、初期化
-                    if (!isInitialized) {
-                        await Tone.start();
-                        console.log('Tone.js context started');
-                        reverb.current = new Tone.Reverb({ decay: 10, preDelay: 0.01 }).toDestination();
-                        delay.current = new Tone.FeedbackDelay('8n', 0.5).toDestination();
-                        filter.current = new Tone.Filter(1500, 'lowpass').toDestination();
-                        distortion.current = new Tone.Distortion(0.4).toDestination();
-                        chorus.current = new Tone.Chorus(4, 2.5, 0.5).toDestination();
-                        setIsInitialized(true);
-                    }
-
-                    // 創造性レベルを設定
-                    const currentCreativity = isCreative ? (creativityLevel * 1.5 > 1 ? 1 : creativityLevel * 1.5) : creativityLevel;
-                    aiComposer.current.setCreativity(currentCreativity);
-
-                    // AIによる作曲
-                    const { parameters, parts } = aiComposer.current.compose();
-                    setCurrentParameters(parameters); // 生成されたパラメータをUIに表示
-
-                    Tone.Transport.bpm.value = parameters.tempo; // テンポを設定
-                    console.log('Generated Parameters:', parameters);
-                    console.log('Generated Parts:', parts);
-
-                    const newInstruments = {};
-                    const newSequences = [];
-                    const activeInstNames = [];
-
-                    // 各楽器のインスタンスを作成し、エフェクトを接続
-                    for (const instrumentName of parameters.instruments) {
-                        const def = instrumentDefinitions[instrumentName];
-                        if (def) {
-                            const inst = createInstrument(instrumentName, def.config);
-                            if (inst) {
-                                // エフェクトを接続 (例: 全ての楽器にリバーブをかける)
-                                if (instrumentName !== 'drums') {
-                                    inst.connect(reverb.current);
-                                    // 必要に応じて他のエフェクトも接続
-                                    // inst.connect(delay.current);
-                                    // inst.connect(filter.current);
-                                } else { // ドラムは個別のシンセに接続
-                                    if (inst.kick) inst.kick.connect(reverb.current);
-                                    if (inst.snare) inst.snare.connect(reverb.current);
-                                    if (inst.hihat) inst.hihat.connect(reverb.current);
-                                }
-                                newInstruments[instrumentName] = inst;
-                                activeInstNames.push(instrumentName);
-                            }
-                        }
-                    }
-                    setInstruments(newInstruments); // 新しい楽器インスタンスを状態に保存
-                    setActiveInstruments(activeInstNames); // アクティブな楽器をUIに表示
-
-                    // 各楽器のパートをシーケンスとして設定
-                    for (const instrumentName in parts) {
-                        const part = parts[instrumentName];
-                        const instrumentInstance = newInstruments[instrumentName]; // 修正点: ここで楽器インスタンスを取得
-                        if (part && instrumentInstance) {
-                            // 修正点: 取得した楽器インスタンスを playInstrumentPart に渡す
-                            const seq = playInstrumentPart(instrumentInstance, instrumentName, part, parameters.tempo);
-                            if (seq) {
-                                newSequences.push(seq);
-                            }
-                        }
-                    }
-                    setSequences(newSequences); // 新しいシーケンスインスタンスを状態に保存
-
+                    setIsGenerating(true);
+                    setAiStatus('generating');
+                    setError('');
+                    
+                    // AIに設定を渡す
+                    aiComposer.setCreativityLevel(creativityLevel);
+                    aiComposer.setEmotion(null, ''); // クリエイティブ生成では感情を使用しない
+                    
+                    // 音楽パラメータ生成
+                    const parameters = aiComposer.generateMusicParameters();
+                    setCurrentParameters(parameters);
+                    
+                    // 楽器作成
+                    const createdInstruments = createInstruments(parameters.instruments);
+                    setInstruments(createdInstruments);
+                    setActiveInstruments(parameters.instruments);
+                    
+                    // 作曲
+                    const composition = await aiComposer.generateComposition(parameters);
+                    setSequences([composition]);
+                    
+                    setAiStatus('ready');
                     setIsGenerating(false);
-                    setIsPlaying(true);
-                    Tone.Transport.start(); // 音楽の再生を開始
-                    setAiStatus('playing');
-
-                } catch (e) {
-                    setError('音楽生成中にエラーが発生しました: ' + e.message);
-                    console.error('Error generating music:', e);
+                    
+                } catch (error) {
+                    setError('クリエイティブ生成でエラーが発生しました: ' + error.message);
                     setIsGenerating(false);
-                    setIsPlaying(false);
                     setAiStatus('error');
-                    stopMusic(); // エラー時は停止
+                }
+            };
+
+            // 感情ベース生成
+            const handleEmotionGenerate = async () => {
+                if (!isInitialized) {
+                    setError('システムが初期化されていません。');
+                    return;
+                }
+                
+                if (!selectedEmotion && !customEmotion.trim()) {
+                    setError('感情を選択するか、カスタム感情を入力してください。');
+                    return;
+                }
+                
+                try {
+                    setIsGenerating(true);
+                    setAiStatus('generating');
+                    setError('');
+                    
+                    // AIに設定を渡す
+                    aiComposer.setCreativityLevel(creativityLevel);
+                    aiComposer.setEmotion(selectedEmotion, customEmotion);
+                    
+                    // 音楽パラメータ生成
+                    const parameters = aiComposer.generateMusicParameters();
+                    setCurrentParameters(parameters);
+                    
+                    // 楽器作成
+                    const createdInstruments = createInstruments(parameters.instruments);
+                    setInstruments(createdInstruments);
+                    setActiveInstruments(parameters.instruments);
+                    
+                    // 作曲
+                    const composition = await aiComposer.generateComposition(parameters);
+                    setSequences([composition]);
+                    
+                    setAiStatus('ready');
+                    setIsGenerating(false);
+                    
+                } catch (error) {
+                    setError('感情ベース生成でエラーが発生しました: ' + error.message);
+                    setIsGenerating(false);
+                    setAiStatus('error');
+                }
+            };
+
+            // 音楽再生/停止
+            const handlePlayStop = async () => {
+                if (!isInitialized) {
+                    setError('システムが初期化されていません。');
+                    return;
+                }
+                
+                try {
+                    if (isPlaying) {
+                        // 停止
+                        Tone.Transport.stop();
+                        Tone.Transport.cancel();
+                        setIsPlaying(false);
+                    } else {
+                        // 再生
+                        if (sequences.length === 0) {
+                            setError('先に音楽を生成してください。');
+                            return;
+                        }
+                        
+                        // AudioContextを開始
+                        if (Tone.context.state !== 'running') {
+                            await Tone.start();
+                        }
+                        
+                        const success = await playComposition(sequences[0], instruments);
+                        if (success) {
+                            setIsPlaying(true);
+                        } else {
+                            setError('音楽の再生に失敗しました。');
+                        }
+                    }
+                } catch (error) {
+                    setError('再生エラー: ' + error.message);
                 }
             };
 
             return (
                 <div className="container">
-                    <header className="header">
+                    <div className="header">
                         <h1 className="title">AI BGM Generator</h1>
-                        <p className="subtitle">AIがあなたのためのオリジナルBGMを生成します</p>
-                    </header>
-                    <main className="content">
-                        {error && <div className="error-message">{error}</div>}
-
-                        <section className="ai-section">
-                            <h2 className="ai-title">
-                                AI Music Generation
-                                <span className={`ai-indicator ${isGenerating ? 'generating' : ''}`}></span>
-                            </h2>
-                            <div className="ai-controls">
-                                <button className="ai-button" onClick={() => generateAndPlayMusic(false)} disabled={isGenerating}>
-                                    {isGenerating ? '生成中...' : '生成して再生'}
-                                </button>
-                                <button className="ai-button creative" onClick={() => generateAndPlayMusic(true)} disabled={isGenerating}>
-                                    {isGenerating ? '生成中...' : 'もっとクリエイティブに！'}
-                                </button>
+                        <p className="subtitle">感情に基づく音楽生成システム</p>
+                    </div>
+                    
+                    <div className="content">
+                        {error && (
+                            <div className="error-message">
+                                {error}
                             </div>
+                        )}
+                        
+                        {/* 感情選択セクション */}
+                        <div className="emotion-section">
+                            <h2 className="emotion-title">
+                                🎭 感情選択
+                            </h2>
+                            
+                            <div className="emotion-grid">
+                                {Object.entries(emotions).map(([key, emotion]) => (
+                                    <div 
+                                        key={key}
+                                        className={`emotion-card ${selectedEmotion === key ? 'selected' : ''}`}
+                                        onClick={() => handleEmotionSelect(key)}
+                                    >
+                                        <span className="emotion-emoji">{emotion.emoji}</span>
+                                        <div className="emotion-name">{emotion.name}</div>
+                                        <div className="emotion-description">{emotion.description}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            <div className="emotion-input-section">
+                                <input
+                                    type="text"
+                                    className="emotion-input"
+                                    placeholder="または、カスタム感情を入力してください..."
+                                    value={customEmotion}
+                                    onChange={(e) => {
+                                        setCustomEmotion(e.target.value);
+                                        setSelectedEmotion('');
+                                    }}
+                                />
+                            </div>
+                            
+                            {(selectedEmotion || customEmotion) && (
+                                <div className="current-emotion">
+                                    <div className="current-emotion-label">選択された感情:</div>
+                                    <div className="current-emotion-value">
+                                        {selectedEmotion ? emotions[selectedEmotion].name : customEmotion}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        
+                        {/* AI生成セクション */}
+                        <div className="ai-section">
+                            <h2 className="ai-title">
+                                🤖 AI音楽生成
+                            </h2>
+                            
+                            <div className="ai-status">
+                                <div className={`ai-indicator ${aiStatus === 'generating' ? 'generating' : ''}`}></div>
+                                <span>
+                                    {aiStatus === 'generating' ? 'AI生成中...' : 
+                                     aiStatus === 'ready' ? 'AI準備完了' : 
+                                     aiStatus === 'error' ? 'エラー発生' : 'AI待機中'}
+                                </span>
+                            </div>
+                            
                             <div className="creativity-slider">
-                                <label htmlFor="creativity" style={{ display: 'block', marginBottom: '10px', color: '#fff', fontSize: '14px' }}>
-                                    クリエイティブレベル: {(creativityLevel * 100).toFixed(0)}%
-                                </label>
+                                <label>クリエイティビティレベル: {Math.round(creativityLevel * 100)}%</label>
                                 <input
                                     type="range"
-                                    id="creativity"
                                     min="0"
                                     max="1"
-                                    step="0.01"
+                                    step="0.1"
                                     value={creativityLevel}
                                     onChange={(e) => setCreativityLevel(parseFloat(e.target.value))}
                                     className="slider"
                                 />
                             </div>
-                            <button
-                                className={`play-button ${isPlaying ? 'active' : ''}`}
-                                onClick={startMusic}
-                                disabled={isGenerating || (!isPlaying && sequences.length === 0)}
-                            >
-                                {isPlaying ? '■ STOP' : '▶ PLAY'}
-                            </button>
-                        </section>
-
-                        <section className="section">
-                            <h2 className="section-title">現在のBGM情報</h2>
-                            <div className="info-container">
-                                <div className="info-row">
-                                    <span className="info-label">ステータス:</span>
-                                    <span className={`info-value ${aiStatus === 'playing' ? 'playing' : (aiStatus === 'error' ? 'stopped' : '')}`}>
-                                        {isGenerating ? '生成中...' : (isPlaying ? '再生中' : '停止中')}
-                                    </span>
-                                </div>
-                                <div className="info-row">
-                                    <span className="info-label">ジャンル:</span>
-                                    <span className="info-value">{currentParameters.genre}</span>
-                                </div>
-                                <div className="info-row">
-                                    <span className="info-label">ムード:</span>
-                                    <span className="info-value">{currentParameters.mood}</span>
-                                </div>
-                                <div className="info-row">
-                                    <span className="info-label">テンポ:</span>
-                                    <span className="info-value">{currentParameters.tempo} BPM</span>
-                                </div>
-                                <div className="info-row">
-                                    <span className="info-label">キー:</span>
-                                    <span className="info-value">{currentParameters.key} {currentParameters.scale}</span>
-                                </div>
+                            
+                            <div className="ai-controls">
+                                <button 
+                                    className="ai-button creative" 
+                                    onClick={handleCreativeGenerate}
+                                    disabled={isGenerating || !isInitialized}
+                                >
+                                    {isGenerating ? '生成中...' : '🎨 クリエイティブ生成'}
+                                </button>
+                                
+                                <button 
+                                    className="ai-button emotion-based" 
+                                    onClick={handleEmotionGenerate}
+                                    disabled={isGenerating || !isInitialized}
+                                >
+                                    {isGenerating ? '生成中...' : '💭 感情ベース生成'}
+                                </button>
                             </div>
-                        </section>
-
-                        <section className="section">
-                            <h2 className="section-title">生成されたパラメータ</h2>
+                        </div>
+                        
+                        {/* 音楽パラメータ表示 */}
+                        <div className="info-container">
+                            <h3 className="section-title">🎵 音楽パラメータ</h3>
                             <div className="parameter-grid">
                                 <div className="parameter-card">
-                                    <div className="parameter-title">複雑性 (Complexity)</div>
-                                    <div className="parameter-value">{(currentParameters.complexity * 100).toFixed(0)}%</div>
-                                    <div className="parameter-description">音の密度と変化の度合い</div>
+                                    <div className="parameter-title">ジャンル</div>
+                                    <div className="parameter-value">{currentParameters.genre}</div>
                                 </div>
                                 <div className="parameter-card">
-                                    <div className="parameter-title">ハーモニー (Harmony)</div>
-                                    <div className="parameter-value">{(currentParameters.harmony * 100).toFixed(0)}%</div>
-                                    <div className="parameter-description">和音の豊かさと安定性</div>
+                                    <div className="parameter-title">ムード</div>
+                                    <div className="parameter-value">{currentParameters.mood}</div>
                                 </div>
                                 <div className="parameter-card">
-                                    <div className="parameter-title">リズム (Rhythm)</div>
-                                    <div className="parameter-value">{(currentParameters.rhythm * 100).toFixed(0)}%</div>
-                                    <div className="parameter-description">リズムの規則性とドライブ感</div>
-                                </div>
-                                <div className="parameter-card">
-                                    <div className="parameter-title">メロディ (Melody)</div>
-                                    <div className="parameter-value">{(currentParameters.melody * 100).toFixed(0)}%</div>
-                                    <div className="parameter-description">主旋律の表現力と覚えやすさ</div>
-                                </div>
-                            </div>
-                        </section>
-
-                        <section className="instruments-section">
-                            <h2 className="section-title">使用中の楽器</h2>
-                            <div className="instrument-grid">
-                                {Object.keys(instrumentDefinitions).map(key => (
-                                    <div
-                                        key={key}
-                                        className={`instrument-card ${activeInstruments.includes(key) ? 'active' : ''}`}
-                                    >
-                                        <span className="instrument-emoji">{instrumentDefinitions[key].emoji}</span>
-                                        <span className="instrument-name">{instrumentDefinitions[key].name}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                    </main>
+                                    <div className="parameter-title"><div className="parameter-title">テンポ</div>
+                    <div className="parameter-value">{currentParameters.tempo} BPM</div>
                 </div>
-            );
-        };
-
-        // React アプリケーションを DOM にレンダリング
-        ReactDOM.render(<AIBGMGenerator />, document.getElementById('root'));
-    </script>
-</body>
-</html>
+                <div className="parameter-card">
+                    <div className="parameter-title">キー</div>
+                    <div className="parameter-value">{currentParameters.key}</div>
+                </div>
+                <div className="parameter-card">
+                    <div className="parameter-title">スケール</div>
+                    <div className="parameter-value">{currentParameters.scale}</div>
+                </div>
+                <div className="parameter-card">
+                    <div className="parameter-title">複雑さ</div>
+                    <div className="parameter-value">{Math.round(currentParameters.complexity * 100)}%</div>
+                </div>
+                <div className="parameter-card">
+                    <div className="parameter-title">ハーモニー</div>
+                    <div className="parameter-value">{Math.round(currentParameters.harmony * 100)}%</div>
+                </div>
+                <div className="parameter-card">
+                    <div className="parameter-title">リズム</div>
+                    <div className="parameter-value">{Math.round(currentParameters.rhythm * 100)}%</div>
+                </div>
+                <div className="parameter-card">
+                    <div className="parameter-title">メロディー</div>
+                    <div className="parameter-value">{Math.round(currentParameters.melody * 100)}%</div>
+                </div>
+                <div className="parameter-card">
+                    <div className="parameter-title">感情</div>
+                    <div className="parameter-value">{currentParameters.emotion}</div>
+                </div>
+            </div>
+        </div>
+        
+        {/* 楽器表示 */}
+        <div className="info-container">
+            <h3 className="section-title">🎹 アクティブ楽器</h3>
+            <div className="instruments-grid">
+                {activeInstruments.map((instrument, index) => (
+                    <div key={index} className="instrument-card">
+                        <div className="instrument-icon">
+                            {instrument === 'piano' ? '🎹' :
+                             instrument === 'guitar' ? '🎸' :
+                             instrument === 'bass' ? '🎸' :
+                             instrument === 'drums' ? '🥁' :
+                             instrument === 'strings' ? '🎻' :
+                             instrument === 'pad' ? '🎧' :
+                             instrument === 'lead' ? '🎤' :
+                             instrument === 'bells' ? '🔔' : '🎵'}
+                        </div>
+                        <div className="instrument-name">{instrument}</div>
+                    </div>
+                ))}
+            </div>
+        </div>
+        
+        {/* 音楽制御 */}
+        <div className="control-section">
+            <h3 className="section-title">🎮 音楽制御</h3>
+            <div className="control-buttons">
+                <button 
+                    className={`control-button ${isPlaying ? 'playing' : ''}`}
+                    onClick={handlePlayStop}
+                    disabled={!isInitialized || sequences.length === 0}
+                >
+                    {isPlaying ? '⏸️ 停止' : '▶️ 再生'}
+                </button>
+                
+                <button 
+                    className="control-button"
+                    onClick={() => {
+                        Tone.Transport.stop();
+                        Tone.Transport.cancel();
+                        setIsPlaying(false);
+                        setSequences([]);
+                        setActiveInstruments([]);
+                        setCurrentParameters({
+                            genre: '',
+                            mood: '',
+                            tempo: 120,
+                            key: 'C',
+                            scale: 'major',
+                            complexity: 0.5,
+                            harmony: 0.7,
+                            rhythm: 0.6,
+                            melody: 0.8,
+                            instruments: [],
+                            emotion: 'neutral'
+                        });
+                    }}
+                    disabled={!isInitialized}
+                >
+                    🔄 リセット
+                </button>
+            </div>
+        </div>
+        
+        {/* 音楽理論情報 */}
+        <div className="info-container">
+            <h3 className="section-title">📚 音楽理論情報</h3>
+            <div className="theory-info">
+                <div className="theory-card">
+                    <h4>コード進行</h4>
+                    <p>選択された調とスケールに基づいて、適切なコード進行を自動生成します。</p>
+                </div>
+                <div className="theory-card">
+                    <h4>メロディー生成</h4>
+                    <p>感情パラメータに基づいて、表現豊かなメロディーラインを作成します。</p>
+                </div>
+                <div className="theory-card">
+                    <h4>リズムパターン</h4>
+                    <p>複雑さレベルに応じて、シンプルから複雑なリズムパターンを生成します。</p>
+                </div>
+                <div className="theory-card">
+                    <h4>楽器編成</h4>
+                    <p>感情と創造性レベルに基づいて、最適な楽器組み合わせを選択します。</p>
+                </div>
+            </div>
+        </div>
+        
+        {/* 使用方法 */}
+        <div className="info-container">
+            <h3 className="section-title">💡 使用方法</h3>
+            <div className="usage-steps">
+                <div className="usage-step">
+                    <div className="step-number">1</div>
+                    <div className="step-content">
+                        <h4>感情を選択</h4>
+                        <p>プリセット感情から選択するか、カスタム感情を入力してください。</p>
+                    </div>
+                </div>
+                <div className="usage-step">
+                    <div className="step-number">2</div>
+                    <div className="step-content">
+                        <h4>クリエイティビティ設定</h4>
+                        <p>スライダーでAIの創造性レベルを調整してください。</p>
+                    </div>
+                </div>
+                <div className="usage-step">
+                    <div className="step-number">3</div>
+                    <div className="step-content">
+                        <h4>音楽を生成</h4>
+                        <p>「感情ベース生成」または「クリエイティブ生成」ボタンを押してください。</p>
+                    </div>
+                </div>
+                <div className="usage-step">
+                    <div className="step-number">4</div>
+                    <div className="step-content">
+                        <h4>音楽を再生</h4>
+                        <p>生成された音楽を「再生」ボタンで聞いてみてください。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {/* フッター */}
+    <div className="footer">
+        <p>AI BGM Generator - 感情に基づく音楽生成システム</p>
+        <p>Powered by Tone.js and Advanced AI Composition</p>
+    </div>
+</div>
+);
